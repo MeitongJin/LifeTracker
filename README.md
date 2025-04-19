@@ -6,3 +6,10 @@ Design intent:
   Lower the threshold of habit formation and foster self-awareness among users.
   Utilize data-driven charts and insights to help users discover patterns and blind spots in their lives.
   Provide social sharing options to inspire positive influence and encouragement among users.
+
+| UWA ID   | Name           | Github user name     |
+|:-------  |:---------------|----------------------|
+| 23463837 | Junxu Liu      | peanut4556           |
+| 24505099 | Aksa Benny     | Aksa-23              |
+| 23986599 | Meitong Jin    | xxx           |
+| 24570882 | Prapti Koirala | xxx          |
