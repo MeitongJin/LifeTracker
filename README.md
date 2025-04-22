@@ -11,5 +11,5 @@ Design intent:
 |:-------  |:---------------|----------------------|
 | 23463837 | Junxu Liu      | peanut4556           |
 | 24505099 | Aksa Benny     | Aksa-23              |
-| 23986599 | Meitong Jin    | xxx           |
-| 24570882 | Prapti Koirala | xxx          |
+| 23986599 | Meitong Jin    | MeitongJin           |
+| 24570882 | Prapti Koirala | praptikoirala        |
