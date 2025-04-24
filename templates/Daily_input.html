@@ -5,59 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LifeTracker --- Daily Input</title>
+  <link rel="stylesheet" href="../static/css/style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      padding: 30px;
-      background-color: #f8f9fa;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .form-section,
-    .output-section {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      margin-bottom: 40px;
-    }
-
-    .chart-placeholder {
-      background-color: #e9ecef;
-      width: 100%;
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #6c757d;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    .emoji-select label {
-      font-size: 1.5rem;
-      margin-right: 10px;
-    }
-
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-    }
-
-    .low-sleep {
-      background-color: #ffe5e5;
-      color: #c0392b;
-      padding: 10px;
-      border-left: 5px solid #e74c3c;
-      border-radius: 5px;
-    }
-  </style>
 </head>
 
 <body>
@@ -178,12 +127,7 @@
     </div>
   </div>
 
-  <script>
-    function toggleExerciseInput(show) {
-      const ele = document.getElementById('exercise-hours');
-      ele.classList.toggle('hidden', !show);
-    }
-  </script>
+  <script src="../static/js/script.js"></script>
 </body>
 
 </html>
