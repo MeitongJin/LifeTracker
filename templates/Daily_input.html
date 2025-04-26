@@ -96,67 +96,52 @@
           </div>
         </form>
       </div>
-    </div>
 
-    <div class="output-section bg-white rounded-xl p-8 shadow-md mb-10">
-      <h2 class="mb-3 text-2xl font-semibold">LifeTracker --- Summary Output</h2>
+      <div class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+        <h2 class="text-2xl font-bold mb-4 text-center">📌 Pre-Submission Disclaimer & Notes</h2>
 
-      <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-        <h5 class="text-lg font-semibold mb-4">🏃 Exercise</h5>
-        <p class="mb-3">3-day Streak</p>
-        <div
-          class="chart-placeholder bg-gray-200 w-full h-52 flex items-center justify-center text-gray-500 rounded-md text-base">
-          [Bar Chart Placeholder]
+        <div class="text-gray-800 text-sm space-y-3 h-60 overflow-y-auto border p-4 rounded">
+          <p><strong>[Description of the use] </strong> The data you submit will be used to analyze and record your
+            health habits (e.g., hours of sleep) in order to provide personalized feedback and trend charts. </p>
+          <p><strong>[Data utilization] </strong> All data will only be used for local analysis and will not be uploaded
+            to servers or shared with third parties unless you voluntarily agree to do so. </p>
+          <p><strong>[Privacy protection] </strong> We store data in LocalStorage and do not collect any sensitive
+            identifying information about you. </p>
+          <p><strong>[User responsibility] </strong> Please ensure that the information you fill in is true and accurate
+            so that the system can provide effective feedback. </p>
+          <p><strong>[Disclaimer] </strong> This app is for daily habit self-management only and does not constitute any
+            medical advice. </p>
+          <hr>
+          <br>
+          <div class="mt-6 flex items-center space-x-2">
+            <input type="checkbox" id="agreeCheck" class="w-4 h-4">
+            <label for="agreeCheck" class="text-sm text-gray-700">I have read and agreed to the above statement </label>
+          </div>
+
+          <button id="submitBtn" class="mt-4 w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50" disabled>
+            Submit data
+          </button>
         </div>
       </div>
 
-      <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-        <h5 class="text-xl font-semibold mb-4">💧 Water Consumption</h5>
-        <div
-          class="chart-placeholder bg-gray-200 w-full h-52 flex items-center justify-center text-gray-500 rounded-md text-base">
-          [Line Chart Placeholder]
-        </div>
-        <p class="mt-3">Average water consumption this week: 2.5L</p>
-      </div>
+      <script>
+        function toggleExerciseInput(show) {
+          const ele = document.getElementById('exercise-hours');
+          ele.classList.toggle('hidden', !show);
+        }
 
-      <div class="card border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-        <h5 class="text-xl font-semibold mb-4">😴 Sleep</h5>
-        <div
-          class="chart-placeholder bg-gray-200 w-full h-52 flex items-center justify-center text-gray-500 rounded-md text-base">
-          [Sleep Chart Placeholder]
-        </div>
-        <p class="mt-3">Weekly Average: 6.5 hrs</p>
-        <div class="low-sleep bg-red-100 text-red-700 p-2 mt-3 border-l-4 border-red-500 rounded">
-          Warning: Below recommended 7h/day
-        </div>
-      </div>
+        const checkbox = document.getElementById('agreeCheck');
+        const submitBtn = document.getElementById('submitBtn');
 
-      <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-        <h5 class="text-xl font-semibold mb-4">📚 Reading Time</h5>
-        <p>Total reading time this month: 200 mins</p>
-      </div>
+        checkbox.addEventListener('change', () => {
+          submitBtn.disabled = !checkbox.checked;
+        });
 
-      <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-        <h5 class="text-xl font-semibold mb-4">📱 Screen Time</h5>
-        <div
-          class="chart-placeholder bg-gray-200 w-full h-52 flex items-center justify-center text-gray-500 rounded-md text-base">
-          [Pie Chart: Digital vs Active]
-        </div>
-      </div>
-
-      <div class="border border-gray-300 rounded-2xl p-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-        <h5 class="text-xl font-semibold mb-4">Weekly Summary</h5>
-        <p>You exercised 4 times, slept an average of 7.5 hrs and had a peak mood. Great Job!!!</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function toggleExerciseInput(show) {
-      const ele = document.getElementById('exercise-hours');
-      ele.classList.toggle('hidden', !show);
-    }
-  </script>
+        submitBtn.addEventListener('click', () => {
+          // For example, saving to localStorage or jumping to
+          alert("Congratulations! The data has been submitted! ");
+        });
+      </script>
 </body>
 
 </html>
