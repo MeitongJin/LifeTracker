@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 .container{
-    @apply h-screen flex justify-center items-center bg-gray-200;
+    @apply h-screen flex justify-center items-center bg-gray-200 text-gray-800;
 }
 
 .btn {
-    @apply bg-gray-700 text-white flex items-center justify-center font-semibold py-2 px-6 w-24 h-10 my-2 rounded hover:bg-gray-600 hover:cursor-pointer;
+    @apply bg-gray-700 text-white flex items-center justify-center font-semibold py-2 px-6 w-fit h-10 my-3 rounded hover:bg-gray-600 hover:cursor-pointer;
 }
 
 .auth-form {
