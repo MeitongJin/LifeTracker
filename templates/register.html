@@ -1,32 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link href="../static/css/output.css" rel="stylesheet">
-  <title>Log In</title>
+  <title>Register</title>
 </head>
-
 <body>
   <div class="container">
-    <form class="auth-form">
+    <form class="auth-form" method="POST" action="{{ url_for('register') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <p class="auth-form-heading">Register at <span class="highlighted-heading">LifeTracker</span></p>
 
       <div class="flex flex-row space-x-3">
-        <input type="text" placeholder="First Name" name="firstname" class="form-input" />
-        <input type="text" placeholder="Last Name" name="lastname" class="form-input" />
+        <input type="text" placeholder="First Name" name="firstname" class="form-input" required>
+        <input type="text" placeholder="Last Name" name="lastname" class="form-input" required>
       </div>
 
-        <input type="email" placeholder="Enter your email" name="email" class="form-input" />
-        <input type="number" pattern="[0-9]{10}" placeholder="1234567890" class="form-input" />
-        <input type="password" placeholder="Enter your password" name="password" class="form-input" />
-        <input type="password" placeholder="Re-enter your password" name="password" class="form-input" />
+      <input type="email" placeholder="Enter your email" name="email" class="form-input" required>
+      <input type="tel" placeholder="1234567890" name="phone" class="form-input" 
+             pattern="[0-9]{10}" required>
+      <input type="password" placeholder="Enter your password" name="password" class="form-input" required>
+      <input type="password" placeholder="Re-enter your password" name="password_confirm" class="form-input" required>
 
-      <button class="btn">Register</button>
+      <button type="submit" class="btn">Register</button>
     </form>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mt-4">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
   </div>
 </body>
-
 </html>
