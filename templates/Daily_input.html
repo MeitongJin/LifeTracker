@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeTracker --- Daily Input</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      /* Use a gradient for the background color. */
+      background: linear-gradient(to right, #d7dde8, #757f9a);
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="p-8 bg-gray-100">
+  <div class="container">
+    <h1 class="mb-4 text-4xl font-semibold">LifeTracker --- Daily Entry</h1>
+
+    <div class="bg-white rounded-xl p-8 shadow-md mb-10">
+      <div class="form-section">
+        <form id="dailyForm">
+          <!-- Physical health component -->
+          <h2 class="text-xl font-semibold mb-4">🔹 Physical Metrics</h2>
+          <div class="mb-3">
+            <label class="form-label">Did you exercise?</label><br>
+            <div class="form-check-inline">
+              <input class="form-check-input" type="radio" name="exercise" value="yes"
+                onclick="toggleExerciseInput(true)">
+              <label class="form-check-label">Yes</label>
+            </div>
+            <div class="form-check-inline">
+              <input class="form-check-input" type="radio" name="exercise" value="no"
+                onclick="toggleExerciseInput(false)">
+              <label class="form-check-label">No</label>
+            </div>
+          </div>
+
+          <div class="mb-3 hidden" id="exercise-hours">
+            <label class="form-label">If yes, how many hours did you spend on exercising?</label>
+            <input type="number" class="form-control" min="0" step="0.1" id="exerciseInput">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">How much water did you drink? (L)</label>
+            <input type="number" class="form-control" min="0" step="0.1" id="waterInput">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">How many hours did you sleep?</label>
+            <input type="number" class="form-control" min="0" step="0.1" id="sleepInput">
+          </div>
+
+          <!-- Growing up and living part -->
+          <h2 class="text-xl font-semibold mb-4">🔹 Growth & Habits</h2>
+          <div class="mb-3">
+            <label class="form-label">How much time did you spend reading? (hrs)</label>
+            <input type="number" class="form-control" min="0" step="0.1" id="readingInput">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">How many times did you eat today?</label>
+            <input type="number" class="form-control" min="0" step="0.1" id="eatInput">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">How many hours did you spend on mobile phone/computer?</label>
+            <input type="number" class="form-control" min="0" step="0.1" id="deviceInput">
+          </div>
+
+          <!-- Feeling part -->
+          <h2 class="text-xl font-semibold mb-4">🔹 Feelings & Productivity</h2>
+          <div class="mb-3">
+            <label class="form-label">How productive was your day? (1-10)</label>
+            <select class="form-select" id="productivityInput">
+              <option selected disabled>Select</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+              <option>9</option>
+              <option>10</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">How is your mood today?</label>
+            <div class="emoji-select ">
+              <label class="text-base space-x-2"><input type="radio" name="mood" value="happy"><span
+                  class="text-2xl">&#128522;</span></label>
+              <br>
+              <label class="space-x-2"><input type="radio" name="mood" value="neutral"><span
+                  class="text-2xl">&#128528;</span></label>
+              <br>
+              <label class="space-x-2"><input type="radio" name="mood" value="sad"><span
+                  class="text-2xl">&#128577;</span></label>
+              <br>
+              <label class="space-x-2"><input type="radio" name="mood" value="angry"><span
+                  class="text-2xl">&#128544;</span></label>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Submission area -->
+      <div class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+        <h2 class="text-2xl font-bold mb-4 text-center">📌 Pre-Submission Disclaimer & Notes</h2>
+
+        <div class="text-gray-800 text-sm space-y-3 h-60 overflow-y-auto border p-4 rounded">
+          <p><strong>[Description of the use] </strong> The data you submit will be used to analyze and record your
+            health habits (e.g., hours of sleep) in order to provide personalized feedback and trend charts. </p>
+          <p><strong>[Data utilization] </strong> All data will only be used for local analysis and will not be uploaded
+            to servers or shared with third parties unless you voluntarily agree to do so. </p>
+          <p><strong>[Privacy protection] </strong> We store data in LocalStorage and do not collect any sensitive
+            identifying information about you. </p>
+          <p><strong>[User responsibility] </strong> Please ensure that the information you fill in is true and accurate
+            so that the system can provide effective feedback. </p>
+          <p><strong>[Disclaimer] </strong> This app is for daily habit self-management only and does not constitute any
+            medical advice. </p>
+          <hr>
+          <br>
+          <div class="mt-6 flex items-center space-x-2">
+            <input type="checkbox" id="agreeCheck" class="w-4 h-4">
+            <label for="agreeCheck" class="text-sm text-gray-700">I have read and agreed to the above statement </label>
+          </div>
+
+          <button id="submitBtn" class="mt-4 w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50" disabled>
+            Submit data
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../static/js/Click&Hide.js"></script>
+</body>
+
+</html>
