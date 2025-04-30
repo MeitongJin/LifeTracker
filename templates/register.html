@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="../static/css/output.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
   <title>Register</title>
 </head>
 <body>
@@ -17,13 +20,26 @@
         <input type="text" placeholder="Last Name" name="lastname" class="form-input" required>
       </div>
 
-      <input type="email" placeholder="Enter your email" name="email" class="form-input" required>
-      <input type="tel" placeholder="1234567890" name="phone" class="form-input" 
-             pattern="[0-9]{10}" required>
-      <input type="password" placeholder="Enter your password" name="password" class="form-input" required>
-      <input type="password" placeholder="Re-enter your password" name="password_confirm" class="form-input" required>
+        <input type="email" placeholder="Enter your email" name="email" class="form-input" />
+        <input type="number" pattern="[0-9]{10}" placeholder="Enter your phone number" class="form-input" />
 
-      <button type="submit" class="btn">Register</button>
+        <div class="relative w-full">
+          <input type="password" placeholder="Enter your password" name="password" class="form-input" id="register-password"/>
+          <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('register-password', 'register-toggle-icon')">
+              <i class="fa-solid fa-eye" id="register-toggle-icon"></i></span>
+          </button>
+        </div>
+        
+        <div class="relative w-full">
+          <input type="password" placeholder="Re-enter your password" name="password" class="form-input" id="register-repeat-password"/>
+          <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('register-repeat-password', 'register-repeat-toggle-icon')">
+              <i class="fa-solid fa-eye" id="register-repeat-toggle-icon"></i></span>
+          </button>
+      </div>
+
+      <button class="btn">Register</button>
+
+      <p class="text-sm -mt-2">Already have an account? <a href="login.html"  class="underline hover:text-gray-600 hover:cursor-pointer">Log In</span></p>
     </form>
     
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -36,5 +52,7 @@
       {% endif %}
     {% endwith %}
   </div>
+
+  <script src="../static/js/auth.js"></script>
 </body>
 </html>
