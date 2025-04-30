@@ -24,7 +24,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
+
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -41,17 +42,21 @@ def validate_email(email):
 def validate_phone(phone):
     return len(phone) == 10 and phone.isdigit()
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    return render_template('login.html')
+
 # Routes
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # Get form data
-        first_name = request.form.get('firstname').strip()
-        last_name = request.form.get('lastname').strip()
-        email = request.form.get('email').strip()
-        phone = request.form.get('phone').strip()
-        password = request.form.get('password')
-        password_confirm = request.form.get('password_confirm')
+        # Get form data with default empty strings
+        first_name = request.form.get('firstname', '').strip()
+        last_name = request.form.get('lastname', '').strip()
+        email = request.form.get('email', '').strip()
+        phone = request.form.get('phone', '').strip()  # Added default empty string
+        password = request.form.get('password', '')
+        password_confirm = request.form.get('password_confirm', '')   
 
         # Validation
         errors = []
