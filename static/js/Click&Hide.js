@@ -43,6 +43,81 @@ function validateInputs() {
   return true;
 }
 
+// The following are new additions. The purpose is to realize the retention of the user's input record when refreshing the page
+function saveToLocal() {
+  const fields = [
+    'exerciseInput',
+    'waterInput',
+    'sleepInput',
+    'readingInput',
+    'eatInput',
+    'deviceInput',
+    'productivityInput',
+  ];
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) localStorage.setItem(id, el.value);
+  });
+
+  // Save radio: exercise
+  const exerciseRadios = document.getElementsByName("exercise");
+  exerciseRadios.forEach(r => {
+    if (r.checked) localStorage.setItem("exerciseRadio", r.value);
+  });
+
+  // Save mood radio
+  const moodRadios = document.getElementsByName("mood");
+  moodRadios.forEach(r => {
+    if (r.checked) localStorage.setItem("moodRadio", r.value);
+  });
+}
+
+
+function loadFromLocal() {
+  const fields = [
+    'exerciseInput',
+    'waterInput',
+    'sleepInput',
+    'readingInput',
+    'eatInput',
+    'deviceInput',
+    'productivityInput',
+  ];
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    const val = localStorage.getItem(id);
+    if (el && val !== null) el.value = val;
+  });
+
+  // // Restore radio: exercise
+  const exerciseValue = localStorage.getItem("exerciseRadio");
+  if (exerciseValue) {
+    const ex = document.querySelector(`input[name="exercise"][value="${exerciseValue}"]`);
+    if (ex) {
+      ex.checked = true;
+      toggleExerciseInput(exerciseValue === "yes"); // show/hide exercise time input
+    }
+  }
+
+  // // Restore mood radio
+  const moodValue = localStorage.getItem("moodRadio");
+  if (moodValue) {
+    const m = document.querySelector(`input[name="mood"][value="${moodValue}"]`);
+    if (m) m.checked = true;
+  }
+}
+
+// Restore filled data when the page loads
+window.addEventListener("load", loadFromLocal);
+
+// Saves the current data each time it is entered
+document.querySelectorAll("input, select").forEach(el => {
+  el.addEventListener("input", saveToLocal);
+});
+
+
 submitBtn.addEventListener('click', () => {
   if (!validateInputs()) {
     return;
