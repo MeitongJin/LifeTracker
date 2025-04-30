@@ -49,7 +49,10 @@ def login():
 # Routes
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+
     if request.method == 'POST':
+        errors = {}  #<-- Dictionary to store field-specific errors
+
         # Get form data with default empty strings
         first_name = request.form.get('firstname', '').strip()
         last_name = request.form.get('lastname', '').strip()
@@ -59,24 +62,33 @@ def register():
         password_confirm = request.form.get('password_confirm', '')   
 
         # Validation
-        errors = []
-        if not all([first_name, last_name, email, phone, password, password_confirm]):
-            errors.append('All fields are required.')
-        if not validate_email(email):
-            errors.append('Invalid email format.')
-        if not validate_phone(phone):
-            errors.append('Phone number must be 10 digits.')
-        if password != password_confirm:
-            errors.append('Passwords do not match.')
-        if len(password) < 8:
-            errors.append('Password must be at least 8 characters.')
-        if User.query.filter_by(email=email).first():
-            errors.append('Email already registered.')
+        if not first_name:
+            errors['firstname'] = 'First name is required.'
+        if not last_name:
+            errors['lastname'] = 'Last name is required.'
+        if not email:
+            errors['email'] = 'Email is required.'
+        elif not validate_email(email):
+            errors['email'] = 'Invalid email format.'
+        elif User.query.filter_by(email=email).first():
+            errors['email'] = 'Email already registered.'
+        if not phone:
+            errors['phone'] = 'Phone number is required.'
+        elif not validate_phone(phone):
+            errors['phone'] = 'Phone number must be 10 digits.'
+        if not password:
+            errors['password'] = 'Password is required.'
+        elif len(password) < 8:
+            errors['password'] = 'Password must be at least 8 characters.'
 
+        if password != password_confirm:
+            errors['password_confirm'] = 'Passwords do not match.'
+
+        # If any errors, re-render the form with them
         if errors:
-            for error in errors:
-                flash(error, 'error')
-            return redirect(url_for('register'))
+            return render_template('register.html', errors=errors,
+                                   firstname=first_name, lastname=last_name,
+                                   email=email, phone=phone)
 
         # Create new user
         new_user = User(
@@ -92,7 +104,10 @@ def register():
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('login'))
 
-    return render_template('register.html')
+    return render_template('register.html', errors={}, first_name='', last_name='', email='', phone='')
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+    
+
