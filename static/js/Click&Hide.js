@@ -109,6 +109,32 @@ function loadFromLocal() {
   }
 }
 
+
+// New function. Clear page after submitting data
+function clearForm() {
+  const fields = [
+    "exerciseInput",
+    "waterInput",
+    "sleepInput",
+    "readingInput",
+    "eatInput",
+    "deviceInput",
+    "productivityInput"
+  ];
+
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+    localStorage.removeItem(id);
+  });
+
+  document.querySelectorAll("input[type=radio]").forEach((r) => (r.checked = false));
+  localStorage.removeItem("exerciseRadio");
+  localStorage.removeItem("moodRadio");
+
+  toggleExerciseInput(false);
+}
+
 // Restore filled data when the page loads
 window.addEventListener("load", loadFromLocal);
 
@@ -124,4 +150,6 @@ submitBtn.addEventListener('click', () => {
   }
   // For example, saving to localStorage or jumping to
   alert("Congratulations! The data has been submitted!");
+  // Clear form after user submits data
+  clearForm();
 });
