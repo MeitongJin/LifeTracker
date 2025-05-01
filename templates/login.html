@@ -14,7 +14,8 @@
 
 <body>
     <div class="container">
-        <form class="auth-form">
+        <form class="auth-form" method="POST" action="/login">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <p class="auth-form-heading">Log In to <span class="highlighted-heading">Life Tracker</span></p>
             
             <input type="email" placeholder="Enter your email" name="email" class="form-input"/>
