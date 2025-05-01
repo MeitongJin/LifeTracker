@@ -1,8 +1,8 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_wtf.csrf import CSRFProtect
+from werkzeug.security import generate_password_hash, check_password_hash, check_password_hash
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 import re
 
 app = Flask(__name__)
@@ -42,11 +42,43 @@ def validate_email(email):
 def validate_phone(phone):
     return len(phone) == 10 and phone.isdigit()
 
+
+# Login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
 
-# Routes
+        user = User.query.filter_by(email=email).first()
+
+        if user and user.check_password(password):
+            session['user_id'] = user.id
+            session['user_name'] = user.first_name
+            flash("Login successful!", "success")
+            return redirect(url_for('home'))
+        else:
+            flash("Invalid email or password", "error")
+            return render_template('login.html')
+
+    csrf_token = generate_csrf()
+    return render_template('login.html', csrf_token=csrf_token)
+
+# Home Route (after login)
+@app.route('/home')
+def home():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('homepage.html', user_name=session.get('user_name'))
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("You have been logged out.", "info")
+    return redirect(url_for('login'))
+
+# Register Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 
