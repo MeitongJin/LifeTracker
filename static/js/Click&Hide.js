@@ -144,12 +144,52 @@ document.querySelectorAll("input, select").forEach(el => {
 });
 
 
+// submitBtn.addEventListener('click', () => {
+  // if (!validateInputs()) {
+    // return;
+  // }
+  // For example, saving to localStorage or jumping to
+  // alert("Congratulations! The data has been submitted!");
+  // Clear form after user submits data
+  // clearForm();
+// });
+
 submitBtn.addEventListener('click', () => {
   if (!validateInputs()) {
     return;
   }
-  // For example, saving to localStorage or jumping to
-  alert("Congratulations! The data has been submitted!");
-  // Clear form after user submits data
-  clearForm();
+
+  // Collect data from the form
+  const data = {
+    exercise: document.querySelector('input[name="exercise"]:checked')?.value || "no",
+    exercise_hours: document.getElementById('exerciseInput')?.value || "0",
+    water_intake: document.getElementById('waterInput')?.value,
+    sleep_hours: document.getElementById('sleepInput')?.value,
+    reading_hours: document.getElementById('readingInput')?.value,
+    meals: document.getElementById('eatInput')?.value,
+    screen_hours: document.getElementById('deviceInput')?.value,
+    productivity: document.getElementById('productivityInput')?.value,
+    mood: document.querySelector('input[name="mood"]:checked')?.value || ""
+  };
+
+  // Send dara to server
+  fetch('/submit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  }).then(response => response.json())
+    .then(result => {
+      if (result.status === 'success') {
+        alert("Congratulations! The data has been submitted!");
+        clearForm(); 
+        window.location.href = "/dashboard";  // Jump to Dashboard after successful submission
+      } else {
+        alert("Submission failed: " + result.message);
+      }
+    }).catch(error => {
+      console.error('Error:', error);
+      alert("Submission error.");
+    });
 });

@@ -3,6 +3,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf.csrf import CSRFProtect
+from datetime import datetime
+from models import db, User
+from input import input_bp
 import re
 
 app = Flask(__name__)
@@ -11,24 +14,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lifetracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize extensions
-db = SQLAlchemy(app)
+db.init_app(app)
 csrf = CSRFProtect(app)
 
-# User Model
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(15), nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
-
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+# Register Blueprint (/submit interface)
+app.register_blueprint(input_bp)
 
 # Create tables
 with app.app_context():
@@ -42,11 +32,41 @@ def validate_email(email):
 def validate_phone(phone):
     return len(phone) == 10 and phone.isdigit()
 
+# Login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
 
-# Routes
+        user = User.query.filter_by(email=email).first()
+        if user and user.check_password(password):
+            session['user_id'] = user.id
+            session['user_name'] = user.first_name
+            flash("Login successful!", "success")
+            return redirect(url_for('home'))
+        else:
+            flash("Invalid email or password", "error")
+            return render_template('login.html')
+
+    csrf_token = generate_csrf()
+    return render_template('login.html', csrf_token=csrf_token)
+
+# Home Route (after login)
+@app.route('/home')
+def home():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('homepage.html', user_name=session.get('user_name'))
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("You have been logged out.", "info")
+    return redirect(url_for('login'))
+
+# Register routes
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 
@@ -105,6 +125,11 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', errors={}, first_name='', last_name='', email='', phone='')
+
+# When the user opens the website, it will automatically jump to the login page
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
