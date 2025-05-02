@@ -1,11 +1,11 @@
 # app.py
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_wtf.csrf import CSRFProtect
 from datetime import datetime
 from models import db, User
 from input import input_bp
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 import re
 
 app = Flask(__name__)
@@ -40,6 +40,7 @@ def login():
         password = request.form.get('password', '')
 
         user = User.query.filter_by(email=email).first()
+        
         if user and user.check_password(password):
             session['user_id'] = user.id
             session['user_name'] = user.first_name
@@ -66,7 +67,7 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for('login'))
 
-# Register routes
+# Register Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 

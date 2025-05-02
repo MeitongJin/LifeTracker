@@ -8,6 +8,7 @@
     <link href="../static/css/output.css" rel="stylesheet">
 </head>
 <body>
+    <p>Welcome, {{ user_name }}!</p>
     <div class="container flex-col">
 
         <div class="fixed top-0 w-full px-10 py-5 flex justify-between">
@@ -16,7 +17,7 @@
                 <a href="homepage.html" class="navbar-item">Home</a>
                 <a href="dashboard.html" class="navbar-item">Dashboard</a>
                 <a href="Daily_input.html" class="navbar-item">Track Progress</a>
-                <a href="login.html" class="navbar-item">Sign Out</a>
+                <a href="{{ url_for('logout') }}" class="navbar-item">Sign Out</a>
             </div>
         </div>
 
