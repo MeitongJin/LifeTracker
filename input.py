@@ -1,12 +1,11 @@
 from flask import Blueprint, request, jsonify, session
 from datetime import datetime
 from models import db, UserInput
-from flask_wtf.csrf import CSRFProtect, csrf_exempt # CSRF protection
+from extensions import csrf
 
-# Create Blueprint，it is convenient to register in app.py
 input_bp = Blueprint('input', __name__)
 
-@csrf_exempt  # Disable CSRF for this route if needed, avoid CSRF intercepting JSON requests
+@csrf.exempt
 @input_bp.route('/submit', methods=['POST'])
 def submit():
     try:
@@ -14,7 +13,6 @@ def submit():
         if not data:
             return jsonify({'status': 'error', 'message': 'No data received'}), 400
 
-        # Store the front-end data as an ORM object
         record = UserInput(
             date=datetime.now().date(),
             exercise=data.get('exercise'),
@@ -31,7 +29,7 @@ def submit():
         db.session.add(record)
         db.session.commit()
 
-        session['last_input'] = data  # Save the data submitted by the user to the session for the front-end to display
+        session['last_input'] = data
         return jsonify({'status': 'success', 'message': 'Data submitted successfully.'})
 
     except Exception as e:
