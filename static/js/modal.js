@@ -1,10 +1,10 @@
 function openModal() {
-  var modal = document.getElementById('confirmModal');
+  let modal = document.getElementById('confirmModal');
   modal.classList.add('show');
 }
 
 function closeModal() {
-  var modal = document.getElementById('confirmModal');
+  let modal = document.getElementById('confirmModal');
   modal.classList.remove('show');
   setTimeout(function () {
     modal.style.display = 'none'; // Delay hiding for smooth animation
