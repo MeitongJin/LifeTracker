@@ -1,36 +1,34 @@
-# app.py
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from models import db, User
+from extensions import db, csrf
+from models import User
 from input import input_bp
-from flask_wtf.csrf import CSRFProtect, generate_csrf
+from flask_wtf.csrf import generate_csrf
 import re
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'  # Should be in environment variables in production
+app.config['SECRET_KEY'] = 'your-secret-key-here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lifetracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize extensions
-db.init_app(app)
-csrf = CSRFProtect(app)
-
-# Register Blueprint (/submit interface)
-app.register_blueprint(input_bp)
-
-# Create tables
-with app.app_context():
-    db.create_all()
-
-# Helper functions
 def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email)
 
 def validate_phone(phone):
     return len(phone) == 10 and phone.isdigit()
+# Initialize extensions
+db.init_app(app)
+csrf.init_app(app)
+
+# Register blueprints
+app.register_blueprint(input_bp)
+
+# Create tables
+with app.app_context():
+    db.create_all()
 
 # Login Route
 @app.route('/login', methods=['GET', 'POST'])

@@ -1,7 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
+from extensions import db
 
-# Initialise SQLAlchemy ORM object
-db = SQLAlchemy()
 
 # User model
 class User(db.Model):
