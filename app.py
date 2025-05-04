@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from extensions import db, csrf
-from flask_migrate import Migrate
+from flask_migrate import Migrate # Import Migrate
 from models import User, UserInput
 from input import input_bp
 from flask_wtf.csrf import generate_csrf
