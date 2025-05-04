@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from extensions import db, csrf
-from models import User
+from flask_migrate import Migrate # Import Migrate
+from models import User, UserInput
 from input import input_bp
 from flask_wtf.csrf import generate_csrf
 import re
@@ -22,13 +23,10 @@ def validate_phone(phone):
 # Initialize extensions
 db.init_app(app)
 csrf.init_app(app)
+migrate = Migrate(app, db) # Update the database with Flask-Migrate
 
 # Register blueprints
 app.register_blueprint(input_bp)
-
-# Create tables
-with app.app_context():
-    db.create_all()
 
 # Login Route
 @app.route('/login', methods=['GET', 'POST'])

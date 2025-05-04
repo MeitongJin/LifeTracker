@@ -9,11 +9,31 @@ input_bp = Blueprint('input', __name__)
 @input_bp.route('/submit', methods=['POST'])
 def submit():
     try:
+        # Get the current login user ID
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'status': 'error', 'message': 'User not logged in'}), 401
+
         data = request.json
         if not data:
             return jsonify({'status': 'error', 'message': 'No data received'}), 400
+        
+        # Validate required fields
+        # Convert data to appropriate types, prevent data formatting errors, avoid service interruption due to type error
+        def to_float(val):
+            try:
+                return float(val)
+            except (TypeError, ValueError):
+                return 0.0
+
+        def to_int(val):
+            try:
+                return int(val)
+            except (TypeError, ValueError):
+                return 0
 
         record = UserInput(
+            user_id=user_id,
             date=datetime.now().date(),
             exercise=data.get('exercise'),
             exercise_hours=float(data.get('exercise_hours', 0)),
