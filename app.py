@@ -1,47 +1,34 @@
-# app.py
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import generate_password_hash, check_password_hash, check_password_hash
-from flask_wtf.csrf import CSRFProtect, generate_csrf
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from extensions import db, csrf
+from models import User
+from input import input_bp
+from flask_wtf.csrf import generate_csrf
 import re
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'  # Should be in environment variables in production
+app.config['SECRET_KEY'] = 'your-secret-key-here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lifetracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize extensions
-db = SQLAlchemy(app)
-csrf = CSRFProtect(app)
-
-# User Model
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    phone = db.Column(db.String(15), nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
-
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-# Create tables
-with app.app_context():
-    db.create_all()
-
-# Helper functions
 def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email)
 
 def validate_phone(phone):
     return len(phone) == 10 and phone.isdigit()
+# Initialize extensions
+db.init_app(app)
+csrf.init_app(app)
 
+# Register blueprints
+app.register_blueprint(input_bp)
+
+# Create tables
+with app.app_context():
+    db.create_all()
 
 # Login Route
 @app.route('/login', methods=['GET', 'POST'])
@@ -51,7 +38,7 @@ def login():
         password = request.form.get('password', '')
 
         user = User.query.filter_by(email=email).first()
-
+        
         if user and user.check_password(password):
             session['user_id'] = user.id
             session['user_name'] = user.first_name
@@ -137,6 +124,11 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', errors={}, first_name='', last_name='', email='', phone='')
+
+# When the user opens the website, it will automatically jump to the login page
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
