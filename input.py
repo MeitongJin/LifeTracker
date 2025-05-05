@@ -36,13 +36,13 @@ def submit():
             user_id=user_id,
             date=datetime.now().date(),
             exercise=data.get('exercise'),
-            exercise_hours=float(data.get('exercise_hours', 0)),
-            water_intake=float(data.get('water_intake', 0)),
-            sleep_hours=float(data.get('sleep_hours', 0)),
-            reading_hours=float(data.get('reading_hours', 0)),
-            meals=int(data.get('meals', 0)),
-            screen_hours=float(data.get('screen_hours', 0)),
-            productivity=int(data.get('productivity', 0)),
+            exercise_hours=to_float(data.get('exercise_hours')),  # Use the previously defined to_float and to_int to handle exceptions and empty values
+            water_intake=to_float(data.get('water_intake')),
+            sleep_hours=to_float(data.get('sleep_hours')),
+            reading_hours=to_float(data.get('reading_hours')),
+            meals=to_int(data.get('meals')),
+            screen_hours=to_float(data.get('screen_hours')),
+            productivity=to_int(data.get('productivity')),
             mood=data.get('mood')
         )
 
