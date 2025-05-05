@@ -9,8 +9,21 @@ from input import input_bp
 from output import output_bp
 from flask_wtf.csrf import generate_csrf
 import re
+from random import randint
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
+
+# Email configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your.email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your-app-password'  # Not your actual password!
+app.config['MAIL_DEFAULT_SENDER'] = 'your.email@gmail.com'
+
+mail = Mail(app)
+
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lifetracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -124,6 +137,67 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', errors={}, first_name='', last_name='', email='', phone='')
+
+@app.route('/resetPassword', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'GET':
+        # Reset session on fresh GET
+        session['reset_step'] = 1
+
+    step = session.get('reset_step', 1)
+    csrf_token = generate_csrf()
+
+    if request.method == 'POST':
+        if step == 1:
+            email = request.form.get('email', '').strip()
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                flash("Email not registered.", "error")
+            else:
+                code = str(randint(100000, 999999))
+                session['reset_email'] = email
+                session['reset_code'] = code
+                session['reset_step'] = 2
+
+                # Send the code via email
+                try:
+                    msg = Message("Your Reset Code", recipients=[email])
+                    msg.body = f"Your password reset code is: {code}"
+                    mail.send(msg)
+                    flash("A verification code has been sent to your email.", "info")
+                except Exception as e:
+                    flash("Failed to send email. Please try again.", "error")
+                    print("Mail error:", e)
+        elif step == 2:
+            entered_code = request.form.get('code', '')
+            if entered_code == session.get('reset_code'):
+                session['reset_step'] = 3
+                flash("Code verified!", "success")
+            else:
+                flash("Invalid code.", "error")
+        elif step == 3:
+            password = request.form.get('password', '')
+            confirm = request.form.get('password_confirm', '')
+
+            if len(password) < 8:
+                flash("Password must be at least 8 characters.", "error")
+            elif password != confirm:
+                flash("Passwords do not match.", "error")
+            else:
+                user = User.query.filter_by(email=session.get('reset_email')).first()
+                user.set_password(password)
+                db.session.commit()
+
+                # Clear session state
+                session.pop('reset_step', None)
+                session.pop('reset_code', None)
+                session.pop('reset_email', None)
+
+                flash("Password updated successfully!", "success")
+                return redirect(url_for('login'))
+
+    return render_template('resetPassword.html', csrf_token=csrf_token, step=step)
+
 
 # When the user opens the website, it will automatically jump to the login page
 @app.route('/')
