@@ -34,5 +34,3 @@ class UserInput(db.Model):
     screen_hours = db.Column(db.Float)
     productivity = db.Column(db.Integer)             # 1 to 10
     mood = db.Column(db.String(20))                  # e.g., "happy"
-
-
