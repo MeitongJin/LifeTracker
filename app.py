@@ -6,6 +6,7 @@ from extensions import db, csrf
 from flask_migrate import Migrate # Import Migrate
 from models import User, UserInput
 from input import input_bp
+from output import output_bp
 from flask_wtf.csrf import generate_csrf
 import re
 
@@ -27,6 +28,7 @@ migrate = Migrate(app, db) # Update the database with Flask-Migrate
 
 # Register blueprints
 app.register_blueprint(input_bp)
+app.register_blueprint(output_bp)
 
 # Login Route
 @app.route('/login', methods=['GET', 'POST'])
