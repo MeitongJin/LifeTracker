@@ -19,6 +19,13 @@
   <div class="output-section bg-white rounded-xl p-8 shadow-md mb-10">
     <h2 class="mb-3 text-2xl font-semibold">LifeTracker --- Summary Output</h2>
     
+    <!-- When data is empty -->
+    {% if message %}
+      <div class="alert alert-warning text-center text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 p-3 mb-5 rounded">
+        {{ message }}
+      </div>
+    {% endif %}
+    
     <!-- Exercise -->
     <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
       <h5 class="text-lg font-semibold mb-4">🏃 Exercise</h5>
