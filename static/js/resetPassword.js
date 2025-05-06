@@ -16,11 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add click handler for resend code link
     document.querySelector('a[href*="resend"]')?.addEventListener('click', function(e) {
         e.preventDefault();
-        fetch('/clear_reset_session', {
-            method: 'POST',
-            credentials: 'same-origin'
-        }).then(() => {
-            window.location.href = "{{ url_for('reset_password') }}";
-        });
+        const link = this;
+        link.textContent = "Sending...";
+        fetch(this.href)
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(err => console.error('Resend error:', err));
     });
 });

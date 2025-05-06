@@ -164,11 +164,28 @@ def reset_password():
     # Always generate CSRF token
     csrf_token = generate_csrf()
     
-    # Force fresh start if coming from external link
+    # Handle forced reset or resend requests
     if request.args.get('force') == '1':
         session.pop('reset_email', None)
         session.pop('reset_code', None)
         session.pop('reset_step', None)
+        return redirect(url_for('reset_password'))
+    
+    # Handle resend code requests
+    if request.args.get('resend') == '1' and 'reset_email' in session:
+        email = session['reset_email']
+        new_code = str(randint(100000, 999999))
+        session['reset_code'] = new_code
+        session['reset_step'] = 2  # Ensure we stay on step 2
+        
+        try:
+            msg = Message("Password Reset Code",
+                        recipients=[email])
+            msg.body = f"Your new reset code is: {new_code}"
+            mail.send(msg)
+            flash("New code sent to your email", "success")
+        except Exception as e:
+            flash("Failed to resend code. Please try again.", "error")
         return redirect(url_for('reset_password'))
     
     # Initialize step (default to 1)
@@ -185,7 +202,8 @@ def reset_password():
                 session.update({
                     'reset_email': email,
                     'reset_code': reset_code,
-                    'reset_step': 2  # Progress to next step
+                    'reset_step': 2,
+                    'code_timestamp': datetime.now().timestamp()
                 })
                 
                 try:
@@ -196,7 +214,6 @@ def reset_password():
                     flash("Reset code sent to your email", "success")
                 except Exception as e:
                     flash("Failed to send email. Please try again.", "error")
-                    # Clear session on failure
                     session.pop('reset_email', None)
                     session.pop('reset_code', None)
                     session.pop('reset_step', None)
@@ -236,18 +253,21 @@ def reset_password():
                     session.pop('reset_email', None)
                     session.pop('reset_code', None)
                     session.pop('reset_step', None)
+                    session.pop('code_timestamp', None)
                     
                     flash("Password updated successfully!", "success")
                     return redirect(url_for('login'))
                 else:
                     flash("Session expired", "error")
                     return redirect(url_for('reset_password'))
-                
+    
     # Additional GET validation
     if request.method == 'GET':
         if step == 2 and not all(k in session for k in ['reset_email', 'reset_code']):
             step = 1
-            session.clear()  # Clear all session data
+            session.pop('reset_email', None)
+            session.pop('reset_code', None)
+            session.pop('reset_step', None)
     
     return render_template("resetPassword.html", 
                          csrf_token=csrf_token, 
