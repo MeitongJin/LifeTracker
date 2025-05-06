@@ -8,9 +8,7 @@
     <link href="../static/css/output.css" rel="stylesheet">
 </head>
 <body>
-    <p>Welcome, {{ user_name }}!</p>
     <div class="container flex-col">
-
         <div class="fixed top-0 w-full px-10 py-5 flex justify-between">
             <h1 class="highlighted-heading">LifeTracker</h1>
             <div class="flex items-center justify-center space-x-7">
@@ -22,6 +20,9 @@
         </div>
 
         <div class="app-intro">
+            <h1 class="text-3xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Welcome, <span class="capitalize">{{ user_name }}</span>!
+              </h1>
             <p class="text-7xl text-gray-700 my-3">DailyLife Tracker.</p>
             <p class="text-3xl my-2">A simple app to track your daily habits and activities.</p>
             <p class="text-3xl mb-4">Input your data easily and view your progress on the dashboard</p>
