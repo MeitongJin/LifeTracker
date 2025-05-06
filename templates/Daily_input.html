@@ -44,41 +44,41 @@
 
           <div class="mb-3 hidden" id="exercise-hours">
             <label class="form-label">If yes, how many hours did you spend on exercising?</label>
-            <input type="number" name="exerciseHour" class="form-control" min="0" step="0.1" id="exerciseInput">
+            <input type="number" name="exerciseHour" class="form-control" min="0" step="0.1" id="exercise_hours">
           </div>
 
           <div class="mb-3">
             <label class="form-label">How much water did you drink? (L)</label>
-            <input type="number" name="waterIntake" class="form-control" min="0" step="0.1" id="waterInput">
+            <input type="number" name="waterIntake" class="form-control" min="0" step="0.1" id="water_intake">
           </div>
 
           <div class="mb-3">
             <label class="form-label">How many hours did you sleep?</label>
-            <input type="number" name="sleepHour" class="form-control" min="0" step="0.1" id="sleepInput">
+            <input type="number" name="sleepHour" class="form-control" min="0" step="0.1" id="sleep_hours">
           </div>
 
           <!-- Growing up and living part -->
           <h2 class="text-xl font-semibold mb-4">🔹 Growth & Habits</h2>
           <div class="mb-3">
             <label class="form-label">How much time did you spend reading? (hrs)</label>
-            <input type="number" name="readingHour" class="form-control" min="0" step="0.1" id="readingInput">
+            <input type="number" name="readingHour" class="form-control" min="0" step="0.1" id="reading_hours">
           </div>
 
           <div class="mb-3">
             <label class="form-label">How many times did you eat today?</label>
-            <input type="number" name="mealNum" class="form-control" min="0" step="0.1" id="eatInput">
+            <input type="number" name="mealNum" class="form-control" min="0" step="0.1" id="meals">
           </div>
 
           <div class="mb-3">
             <label class="form-label">How many hours did you spend on mobile phone/computer?</label>
-            <input type="number" name="deviceHour" class="form-control" min="0" step="0.1" id="deviceInput">
+            <input type="number" name="deviceHour" class="form-control" min="0" step="0.1" id="screen_hours">
           </div>
 
           <!-- Feeling part -->
           <h2 class="text-xl font-semibold mb-4">🔹 Feelings & Productivity</h2>
           <div class="mb-3">
             <label class="form-label">How productive was your day? (1-10)</label>
-            <select class="form-select" name="productivityNum" id="productivityInput">
+            <select class="form-select" name="productivityNum" id="productivity">
               <option selected disabled>Select</option>
               <option>1</option>
               <option>2</option>
@@ -143,6 +143,58 @@
   </div>
 
   <script src="../static/js/Click&Hide.js"></script>
+
+  <script>
+    // Control exercise input display
+    function toggleExerciseInput(show) {
+      document.getElementById('exercise-hours').classList.toggle('hidden', !show);
+    }
+  
+    // Enable the submit button only when the checkbox is checked
+    document.getElementById('agreeCheck').addEventListener('change', function () {
+      document.getElementById('submitBtn').disabled = !this.checked;
+    });
+  
+    // Submit data
+    document.getElementById('submitBtn').addEventListener('click', async function () {
+      const data = {
+        exercise: document.querySelector('input[name="exercise"]:checked')?.value || 'no',
+        exercise_hours: document.getElementById('exercise_hours').value || 0,
+        water_intake: document.getElementById('water_intake').value || 0,
+        sleep_hours: document.getElementById('sleep_hours').value || 0,
+        reading_hours: document.getElementById('reading_hours').value || 0,
+        meals: document.getElementById('meals').value || 0,
+        screen_hours: document.getElementById('screen_hours').value || 0,
+        productivity: document.getElementById('productivity').value || 0,
+        mood: document.querySelector('input[name="mood"]:checked')?.value || ''
+      };
+  
+      try {
+        const response = await fetch('/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+  
+        const result = await response.json();
+        alert(result.message);
+  
+        if (result.status === 'success') {
+          document.getElementById('dailyForm').reset();
+          document.getElementById('submitBtn').disabled = true;
+          document.getElementById('exercise-hours').classList.add('hidden');
+          // Automatically jump to the dashboard page（wait for dashboard）
+          // window.location.href = "/dashboard"
+
+        }
+      } catch (error) {
+        alert('Submission failed: ' + error.message);
+      }
+    });
+  </script>
+
 </body>
 
 </html>
