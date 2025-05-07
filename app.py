@@ -7,6 +7,8 @@ import re
 from random import randint
 from flask_mail import Mail, Message
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Prohibit the use of GUI back-end to prevent crashes 
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -315,8 +317,8 @@ def submit():
         return jsonify({'status': 'error', 'message': str(e)}), 500
     
 # Output Route
-@app.route('/dashboard')
-def dashboard():
+@app.route('/daily_output')
+def daily_output():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 

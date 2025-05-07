@@ -184,7 +184,7 @@ submitBtn.addEventListener('click', () => {
       if (result.status === 'success') {
         alert("Congratulations! The data has been submitted!");
         clearForm(); 
-        window.location.href = "/dashboard";  // Jump to Dashboard after successful submission
+        window.location.href = "/daily_output";  // Jump to daily_output after successful submission
       } else {
         alert("Submission failed: " + result.message);
       }
