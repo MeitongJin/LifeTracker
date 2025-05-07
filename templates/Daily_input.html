@@ -185,8 +185,8 @@
           document.getElementById('dailyForm').reset();
           document.getElementById('submitBtn').disabled = true;
           document.getElementById('exercise-hours').classList.add('hidden');
-          // Automatically jump to the dashboard page（wait for dashboard）
-          // window.location.href = "/dashboard"
+          // Automatically jump to the dashboard page after submitted
+          window.location.href = "/dashboard"
 
         }
       } catch (error) {
