@@ -16,10 +16,56 @@
     .hidden {
       display: none;
     }
+
+    .dark-mode {
+      background: linear-gradient(to right, #2c3e50, #4c5671);
+      color: #ffffff;
+    }
+
+    .dark-mode .bg-white {
+      background-color: #374151;
+    }
+
+    .dark-mode .form-control,
+    .dark-mode .form-select {
+      background-color: #c5d0df;
+      color: yellow;
+      border-color: #6b7280;
+    }
+
+    .dark-mode .form-control::placeholder,
+    .dark-mode .form-select::placeholder {
+      color: #d1d5db;
+    }
+
+    .dark-mode h1,
+    .dark-mode h2 {
+      color: black;
+    }
+
+    .dark-mode label {
+      color: red;
+    }
+
+    .dark-mode .text-gray-800 {
+      color: black;
+    }
+
+    .dark-mode .emoji-label span {
+      filter: brightness(1.2);
+    }
+
+    .dark-mode .tooltip {
+      color: #e5e7eb;
+    }
   </style>
 </head>
 
 <body class="p-8 bg-gray-100">
+  <button id="darkModeToggle" class="absolute top-4 right-4 bg-gray-200 rounded p-2">
+    Dark Mode
+  </button>
+
   <div class="container">
     <h1 class="mb-4 text-4xl font-semibold">LifeTracker --- Daily Entry</h1>
 
@@ -149,12 +195,12 @@
     function toggleExerciseInput(show) {
       document.getElementById('exercise-hours').classList.toggle('hidden', !show);
     }
-  
+
     // Enable the submit button only when the checkbox is checked
     document.getElementById('agreeCheck').addEventListener('change', function () {
       document.getElementById('submitBtn').disabled = !this.checked;
     });
-  
+
     // Submit data
     document.getElementById('submitBtn').addEventListener('click', async function () {
       const data = {
@@ -168,7 +214,7 @@
         productivity: document.getElementById('productivity').value || 0,
         mood: document.querySelector('input[name="mood"]:checked')?.value || ''
       };
-  
+
       try {
         const response = await fetch('/submit', {
           method: 'POST',
@@ -177,10 +223,10 @@
           },
           body: JSON.stringify(data)
         });
-  
+
         const result = await response.json();
         alert(result.message);
-  
+
         if (result.status === 'success') {
           document.getElementById('dailyForm').reset();
           document.getElementById('submitBtn').disabled = true;
