@@ -14,9 +14,9 @@
         <div class="fixed top-0 w-full px-10 py-5 flex justify-between">
             <h1 class="highlighted-heading">LifeTracker</h1>
             <div class="flex items-center justify-center space-x-7">
-                <a href="homepage.html" class="navbar-item">Home</a>
-                <a href="dashboard.html" class="navbar-item">Dashboard</a>
-                <a href="Daily_input.html" class="navbar-item">Track Progress</a>
+                <a href="{{ url_for('home') }}" class="navbar-item">Home</a>
+                <a href="{{ url_for('dashboard') }}" class="navbar-item">Dashboard</a>
+                <a href="{{ url_for('daily_input') }}" class="navbar-item">Track Progress</a>
                 <a href="{{ url_for('logout') }}" class="navbar-item">Sign Out</a>
             </div>
         </div>
@@ -25,7 +25,7 @@
             <p class="text-7xl text-gray-700 my-3">DailyLife Tracker.</p>
             <p class="text-3xl my-2">A simple app to track your daily habits and activities.</p>
             <p class="text-3xl mb-4">Input your data easily and view your progress on the dashboard</p>
-            <a href="Daily_input.html" class="btn text-center">Get Started</a>
+            <a href="{{ url_for('daily_input') }}" class="btn text-center">Get Started</a>
         </div>
     </div>
 </body>
