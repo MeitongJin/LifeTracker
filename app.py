@@ -1,18 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from extensions import db, csrf
 from flask_migrate import Migrate # Import Migrate
-from models import User, UserInput
-from input import input_bp
-from output import output_bp
 from flask_wtf.csrf import generate_csrf
 import re
 from random import randint
 from flask_mail import Mail, Message
-import uuid
-from flask import render_template, request, redirect, url_for, session, flash
+import pandas as pd
+import matplotlib.pyplot as plt
+import io
+import base64
+# Custom modules
+from extensions import db, csrf
+from models import User, UserInput
+from input import to_float, to_int
+from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
 
 app = Flask(__name__)
 
@@ -58,10 +60,6 @@ This code will expire in 10 minutes."""
 db.init_app(app)
 csrf.init_app(app)
 migrate = Migrate(app, db) # Update the database with Flask-Migrate
-
-# Register blueprints
-app.register_blueprint(input_bp)
-app.register_blueprint(output_bp)
 
 # Login Route
 @app.route('/login', methods=['GET', 'POST'])
@@ -158,7 +156,7 @@ def register():
 
     return render_template('register.html', errors={}, first_name='', last_name='', email='', phone='')
 
-#Reset Password
+# Reset Password
 @app.route('/resetPassword', methods=['GET', 'POST'])
 def reset_password():
     # Always generate CSRF token
@@ -273,7 +271,97 @@ def reset_password():
                          csrf_token=csrf_token, 
                          step=step)
 
-#ResetPassword Clear Session
+# User Input Route
+@app.route('/submit', methods=['POST'])
+@csrf.exempt
+def submit():
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'status': 'error', 'message': 'User not logged in'}), 401
+
+        data = request.json
+        if not data:
+            return jsonify({'status': 'error', 'message': 'No data received'}), 400
+
+        record = UserInput(
+            user_id=user_id,
+            date=datetime.now().date(),
+            exercise=data.get('exercise'),
+            exercise_hours=to_float(data.get('exercise_hours')),
+            water_intake=to_float(data.get('water_intake')),
+            sleep_hours=to_float(data.get('sleep_hours')),
+            reading_hours=to_float(data.get('reading_hours')),
+            meals=to_int(data.get('meals')),
+            screen_hours=to_float(data.get('screen_hours')),
+            productivity=to_int(data.get('productivity')),
+            mood=data.get('mood')
+        )
+
+        db.session.add(record)
+        db.session.commit()
+
+        session['last_input'] = data
+        return jsonify({'status': 'success', 'message': 'Data submitted successfully.'})
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+# Output Route
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    records = get_past_week_inputs(user_id)
+
+    if not records:
+        return render_template("Daily_output.html", message="No data found.")
+
+    df = pd.DataFrame([{
+        "date": r.date.strftime('%Y-%m-%d'),
+        "exercise": 1 if r.exercise == "yes" else 0,
+        "exercise_hours": r.exercise_hours or 0,
+        "water": r.water_intake or 0,
+        "sleep": r.sleep_hours or 0,
+        "reading": r.reading_hours or 0,
+        "screen": r.screen_hours or 0,
+        "productivity": r.productivity or 0,
+        "mood": r.mood or ""
+    } for r in records])
+
+    df.set_index("date", inplace=True)
+
+    exercise_chart = generate_bar_chart(df["exercise_hours"].to_dict(), "Exercise Hours", "Hours")
+    water_chart = generate_bar_chart(df["water"].to_dict(), "Water Intake", "Litres")
+    sleep_chart = generate_bar_chart(df["sleep"].to_dict(), "Sleep Hours", "Hours")
+    screen_vs_active = generate_pie_chart(df["screen"].sum(), max(0.1, df["exercise_hours"].sum() + df["reading"].sum()))
+
+    streak = int(df["exercise"].sum())
+    water_avg = df["water"].mean()
+    sleep_avg = df["sleep"].mean()
+    reading_total = int(df["reading"].sum() * 60)
+    sleep_warning = sleep_avg < 7
+    summary = (
+        f"You exercised {df['exercise'].sum()} times, "
+        f"slept an average of {sleep_avg:.1f} hrs "
+        f"and had a peak mood. Great Job!!!"
+    )
+
+    return render_template("Daily_output.html",
+                           exercise_chart=exercise_chart,
+                           water_chart=water_chart,
+                           sleep_chart=sleep_chart,
+                           screen_chart=screen_vs_active,
+                           streak=streak,
+                           water_avg=f"{water_avg:.1f}",
+                           sleep_avg=f"{sleep_avg:.1f}",
+                           reading_total=reading_total,
+                           sleep_warning=sleep_warning,
+                           summary=summary)
+
+# ResetPassword Clear Session
 @app.route('/clear_reset_session', methods=['POST'])
 def clear_reset_session():
     session.pop('reset_email', None)
