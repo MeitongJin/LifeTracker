@@ -18,16 +18,22 @@
                 <a href="{{ url_for('logout') }}" class="navbar-item">Sign Out</a>
             </div>
         </div>
+
         <div class="app-intro">
             <h1 class="text-3xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Welcome, <span class="capitalize">{{ user_name }}</span>!
+                Good 
+                <span id="time-greeting">Morning</span>, 
+                <span class="capitalize">{{ user_name }}</span>!
               </h1>
             <p class="text-7xl text-gray-700 my-3">DailyLife Tracker.</p>
             <p class="text-3xl my-2">A simple app to track your daily habits and activities.</p>
             <p class="text-3xl mb-4">Input your data easily and view your progress on the dashboard</p>
             <a href="Daily_input.html" class="btn text-center">Get Started</a>
         </div>
+        <div class="motivation-quote text-center italic text-gray-500 text-xl my-12">
+            <p>"Progress is progress, no matter how small."</p>
+          </div>
     </div>
-
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>
 </html>
