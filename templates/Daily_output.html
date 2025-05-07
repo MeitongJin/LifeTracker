@@ -18,55 +18,65 @@
 <body class="p-8 bg-gray-100">
   <div class="output-section bg-white rounded-xl p-8 shadow-md mb-10">
     <h2 class="mb-3 text-2xl font-semibold">LifeTracker --- Summary Output</h2>
-
+    
+    <!-- When data is empty -->
+    {% if message %}
+      <div class="alert alert-warning text-center text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 p-3 mb-5 rounded">
+        {{ message }}
+      </div>
+    {% endif %}
+    
+    <!-- Exercise -->
     <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
       <h5 class="text-lg font-semibold mb-4">🏃 Exercise</h5>
-      <p class="mb-3">3-day Streak</p>
-      <div
-        class="chart-placeholder bg-gray-200 w-full h-52 flex items-center justify-center text-gray-500 rounded-md text-base">
-        [Bar Chart Placeholder]
+      <p class="mb-3">{{ streak }}-day Streak</p>
+      <div class="bg-gray-100 rounded">
+        <img src="{{ exercise_chart }}" alt="Exercise Chart" class="rounded w-full h-52 object-contain" />
       </div>
     </div>
-
+    
+    <!-- Water -->
     <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
       <h5 class="text-xl font-semibold mb-4">💧 Water Consumption</h5>
-      <div
-        class="chart-placeholder bg-gray-200 w-full h-52 flex items-center justify-center text-gray-500 rounded-md text-base">
-        [Line Chart Placeholder]
+      <div class="bg-gray-100 rounded">
+        <img src="{{ water_chart }}" alt="Water Chart" class="rounded w-full h-52 object-contain" />
       </div>
-      <p class="mt-3">Average water consumption this week: 2.5L</p>
+      <p class="mt-3">Average water consumption this week: {{ water_avg }}L</p>
     </div>
 
+    <!-- Sleep -->
     <div class="card border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
       <h5 class="text-xl font-semibold mb-4">😴 Sleep</h5>
-      <div
-        class="chart-placeholder bg-gray-200 w-full h-52 flex items-center justify-center text-gray-500 rounded-md text-base">
-        [Sleep Chart Placeholder]
+      <div class="bg-gray-100 rounded">
+        <img src="{{ sleep_chart }}" alt="Sleep Chart" class="rounded w-full h-52 object-contain" />
       </div>
-      <p class="mt-3">Weekly Average: 6.5 hrs</p>
+      <p class="mt-3">Weekly Average: {{ sleep_avg }} hrs</p>
+      {% if sleep_warning %}
       <div class="low-sleep bg-red-100 text-red-700 p-2 mt-3 border-l-4 border-red-500 rounded">
         Warning: Below recommended 7h/day
       </div>
+      {% endif %}
     </div>
 
+    <!-- Reading -->
     <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
       <h5 class="text-xl font-semibold mb-4">📚 Reading Time</h5>
-      <p>Total reading time this month: 200 mins</p>
+      <p>Total reading time this month: {{ reading_total }} mins</p>
     </div>
 
+    <!-- Screen -->
     <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
       <h5 class="text-xl font-semibold mb-4">📱 Screen Time</h5>
-      <div
-        class="chart-placeholder bg-gray-200 w-full h-52 flex items-center justify-center text-gray-500 rounded-md text-base">
-        [Pie Chart: Digital vs Active]
+      <div class="bg-gray-100 rounded">
+        <img src="{{ screen_chart }}" alt="Screen Pie Chart" class="rounded w-full h-52 object-contain" />
       </div>
     </div>
 
+    <!-- Weekly Summary -->
     <div class="border border-gray-300 rounded-2xl p-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
       <h5 class="text-xl font-semibold mb-4">Weekly Summary</h5>
-      <p>You exercised 4 times, slept an average of 7.5 hrs and had a peak mood. Great Job!!!</p>
+      <p>{{ summary }}</p> 
     </div>
-  </div>
   </div>
 </body>
 

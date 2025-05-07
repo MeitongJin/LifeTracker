@@ -1,40 +1,12 @@
-from flask import Blueprint, request, jsonify, session
-from datetime import datetime
-from models import db, UserInput
-from flask_wtf.csrf import CSRFProtect, csrf_exempt # CSRF protection
-
-# Create Blueprint，it is convenient to register in app.py
-input_bp = Blueprint('input', __name__)
-
-@csrf_exempt  # Disable CSRF for this route if needed, avoid CSRF intercepting JSON requests
-@input_bp.route('/submit', methods=['POST'])
-def submit():
+# Input data type conversion
+def to_float(val):
     try:
-        data = request.json
-        if not data:
-            return jsonify({'status': 'error', 'message': 'No data received'}), 400
+        return float(val)
+    except (TypeError, ValueError):
+        return 0.0
 
-        # Store the front-end data as an ORM object
-        record = UserInput(
-            date=datetime.now().date(),
-            exercise=data.get('exercise'),
-            exercise_hours=float(data.get('exercise_hours', 0)),
-            water_intake=float(data.get('water_intake', 0)),
-            sleep_hours=float(data.get('sleep_hours', 0)),
-            reading_hours=float(data.get('reading_hours', 0)),
-            meals=int(data.get('meals', 0)),
-            screen_hours=float(data.get('screen_hours', 0)),
-            productivity=int(data.get('productivity', 0)),
-            mood=data.get('mood')
-        )
-
-        db.session.add(record)
-        db.session.commit()
-
-        session['last_input'] = data  # Save the data submitted by the user to the session for the front-end to display
-        return jsonify({'status': 'success', 'message': 'Data submitted successfully.'})
-
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
+def to_int(val):
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return 0

@@ -270,12 +270,6 @@
   .mt-10 {
     margin-top: calc(var(--spacing) * 10);
   }
-  .mt-28 {
-    margin-top: calc(var(--spacing) * 28);
-  }
-  .mr-1 {
-    margin-right: calc(var(--spacing) * 1);
-  }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
   }
@@ -367,16 +361,6 @@
   }
   .justify-center {
     justify-content: center;
-  }
-  .gap-6 {
-    gap: calc(var(--spacing) * 6);
-  }
-  .space-y-2 {
-    :where(& > :not(:last-child)) {
-      --tw-space-y-reverse: 0;
-      margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
-      margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
-    }
   }
   .space-y-3 {
     :where(& > :not(:last-child)) {
@@ -688,6 +672,23 @@
       text-decoration-line: underline;
     }
   }
+}
+body {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  background-color: #f3f4f6; /* Gray-100 in Tailwind */
+}
+.container {
+  width: 100%;
+  max-width: 1600px;
+}
+.app-intro {
+  padding-top: 120px;
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 @property --tw-translate-x {
   syntax: "*";

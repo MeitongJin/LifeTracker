@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pre-rejistration</title>
+  <style>
+    #process {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    #cancel {
+      background-color: #ccc;
+      color: black;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    /* Modal box overall */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Modal box popup window content */
+    .modal-content {
+      background: white;
+      width: 300px;
+      margin: 150px auto;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Modal box display status */
+    .modal.show {
+      display: block;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="max-width: 600px; margin: auto; font-family: Arial, sans-serif; padding: 20px;">
+    <h2>Pre-registration Information</h2>
+    <p>Welcome to the LifeTracker Health app! For your protection and to provide quality service, please read the
+      following carefully before registering: </p>
+    <ul>
+      <li><strong>Statement of Non-Medical Services: </strong> This app provides health tracking advice only and does
+        not constitute a professional medical diagnosis or treatment. </li>
+      <li><strong>Data accuracy: </strong> Depends on user input and device data, may have some errors. </li>
+      <li><strong>Privacy: </strong> We strictly protect your personal information and health data (see Privacy Policy
+        for details). </li>
+      <li><strong>Account Security: </strong> Please keep your login information in a safe place, as you are responsible
+        for any risks caused by the user. </li>
+      <li><strong>User Age Requirements: </strong> Registered users need to be at least 18 years old, minors need the
+        consent of a guardian. </li>
+      <li><strong>Change and Termination of Services: </strong> LifeTracker reserves the right to adjust or terminate
+        some of the services as needed. </li>
+      <li><strong>Compliance use: </strong> Please comply with relevant laws and regulations and platform rules. </li>
+      <li><strong>Agreed: </strong> By registering, you agree to the User Agreement and Privacy Policy. </li>
+    </ul>
+
+    <div style="margin-top: 30px; text-align: center;">
+      <button onclick="openModal()"
+        style="background-color: #4CAF50; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+        ✅ Agree and start registering
+      </button>
+      <button onclick="cancelRegistration()"
+        style="background-color: #ccc; color: black; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-left: 15px;">
+        ❌ Cancel registration
+      </button>
+    </div>
+  </div>
+
+  <!-- A modal -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <h3>Confirmation of registration</h3>
+      <p style="margin:20px 0;">Please confirm that you have read and agree to all the terms and conditions, do you
+        continue to register?</p>
+      <button onclick="proceedRegistration()" id="process">
+        confirm
+      </button>
+      <button onclick="closeModal()" id='cancel'>
+        cancel
+      </button>
+    </div>
+  </div>
+
+  <script src="../static/js/modal.js"></script>
+</body>
+
+</html>

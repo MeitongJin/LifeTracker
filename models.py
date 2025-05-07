@@ -1,7 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
+from extensions import db
 
-# Initialise SQLAlchemy ORM object
-db = SQLAlchemy()
 
 # User model
 class User(db.Model):
@@ -25,6 +23,7 @@ class UserInput(db.Model):
     __tablename__ = 'user_inputs'
 
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='fk_userinput_user_id'), nullable=False) # Add foreign key to link with user
     date = db.Column(db.Date, nullable=False)
     exercise = db.Column(db.String(10))              # "yes" or "no"
     exercise_hours = db.Column(db.Float)             # e.g., 1.5
@@ -35,5 +34,3 @@ class UserInput(db.Model):
     screen_hours = db.Column(db.Float)
     productivity = db.Column(db.Integer)             # 1 to 10
     mood = db.Column(db.String(20))                  # e.g., "happy"
-
-
