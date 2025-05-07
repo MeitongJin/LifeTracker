@@ -272,6 +272,13 @@ def reset_password():
                          step=step)
 
 # User Input Route
+@app.route('/daily_input')
+def daily_input():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('Daily_input.html')
+
+# User Input Submission
 @app.route('/submit', methods=['POST'])
 @csrf.exempt
 def submit():
