@@ -1,5 +1,7 @@
 from models import db, UserInput
 from datetime import date, timedelta
+import matplotlib
+matplotlib.use('Agg') # Prohibit the use of GUI back-end to prevent crashes
 import matplotlib.pyplot as plt
 import io
 import base64
