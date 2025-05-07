@@ -1,0 +1,44 @@
+{
+    "exercise_data": [
+      { "date": "2025-04-10", "exercised": true, "hours": 1.5 },
+      { "date": "2025-04-11", "exercised": false, "hours": 0 },
+      { "date": "2025-04-12", "exercised": true, "hours": 0.75 },
+      { "date": "2025-04-13", "exercised": true, "hours": 2 },
+      { "date": "2025-04-14", "exercised": true, "hours": 1 },
+      { "date": "2025-04-15", "exercised": false, "hours": 0 },
+      { "date": "2025-04-16", "exercised": true, "hours": 1.25 }
+    ],
+    "water_data": [
+      { "date": "2025-04-10", "liters": 2.5 },
+      { "date": "2025-04-11", "liters": 1.8 },
+      { "date": "2025-04-12", "liters": 3.0 },
+      { "date": "2025-04-13", "liters": 2.2 },
+      { "date": "2025-04-14", "liters": 1.5 },
+      { "date": "2025-04-15", "liters": 2.7 },
+      { "date": "2025-04-16", "liters": 3.5 }
+    ],
+    "sleep_data": [
+      { "date": "2025-04-10", "hours": 7.5 },
+      { "date": "2025-04-11", "hours": 6.0 },
+      { "date": "2025-04-12", "hours": 8.5 },
+      { "date": "2025-04-13", "hours": 5.5 },
+      { "date": "2025-04-14", "hours": 7.0 },
+      { "date": "2025-04-15", "hours": 4.5 },
+      { "date": "2025-04-16", "hours": 6.5 }
+    ],
+    "screen_time_data": [
+      { "date": "2025-04-16", "screen_time": 5.5, "active_hours": 4.0 },
+      { "date": "2025-04-15", "screen_time": 8.0, "active_hours": 2.5 },
+      { "date": "2025-04-14", "screen_time": 4.0, "active_hours": 6.0 }
+    ],
+    "mood_productivity_data": [
+      { "date": "2025-04-10", "mood": "happy", "productivity": 8 },
+      { "date": "2025-04-11", "mood": "neutral", "productivity": 5 },
+      { "date": "2025-04-12", "mood": "excited", "productivity": 9 },
+      { "date": "2025-04-13", "mood": "sad", "productivity": 3 },
+      { "date": "2025-04-14", "mood": "happy", "productivity": 7 },
+      { "date": "2025-04-15", "mood": "angry", "productivity": 4 },
+      { "date": "2025-04-16", "mood": "neutral", "productivity": 6 }
+    ]
+  }
+  
