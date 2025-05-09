@@ -17,6 +17,8 @@ from extensions import db, csrf
 from models import User, UserInput
 from input import to_float, to_int
 from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 
@@ -57,6 +59,32 @@ This code will expire in 10 minutes."""
     except Exception as e:
         print(f"Failed to send email: {str(e)}")  # Detailed error logging
         return False
+    
+def get_user_inputs(user_id, days=7):
+    """Get user inputs for specified number of days"""
+    end_date = datetime.now().date()
+    start_date = end_date - timedelta(days=days-1)
+    
+    return UserInput.query.filter(
+        UserInput.user_id == user_id,
+        UserInput.date >= start_date,
+        UserInput.date <= end_date
+    ).order_by(UserInput.date).all()
+
+def prepare_exercise_data(records):
+    return {
+        'hours': [r.exercise_hours or 0 for r in records],
+        'days': [r.exercise == 'yes' for r in records]
+    }
+
+def prepare_water_data(records):
+    return [r.water_intake or 0 for r in records]
+
+def prepare_sleep_data(records):
+    return [r.sleep_hours or 0 for r in records]
+
+def prepare_screen_data(records):
+    return [r.screen_hours or 0 for r in records]
     
 # Initialize extensions
 db.init_app(app)
@@ -369,6 +397,34 @@ def daily_output():
                            reading_total=reading_total,
                            sleep_warning=sleep_warning,
                            summary=summary)
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    # Get the user inputs for the selected range (7 or 30 days)
+    range = request.args.get('range', '7')
+    user_inputs = get_user_inputs(session['user_id'], days=int(range))
+
+    # Prepare the data for the charts
+    exercise_data = prepare_exercise_data(user_inputs)
+    water_data = prepare_water_data(user_inputs)
+    sleep_data = prepare_sleep_data(user_inputs)
+    screen_data = prepare_screen_data(user_inputs)
+    dates = [input.date.strftime('%Y-%m-%d') for input in user_inputs]
+
+    chart_data = {
+        'exercise': exercise_data['hours'],
+        'water': water_data,
+        'sleep': sleep_data,
+        'screen': screen_data
+    }
+
+    return render_template('dashboard.html', 
+                           chart_data=chart_data, 
+                           current_range=range,
+                           dates=dates)
 
 # ResetPassword Clear Session
 @app.route('/clear_reset_session', methods=['POST'])
