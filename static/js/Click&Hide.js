@@ -1,3 +1,14 @@
+// Switch between dark and light mode
+document.getElementById('darkModeToggle').addEventListener('click', function () {
+  document.body.classList.toggle('dark-mode');
+
+  if (document.body.classList.contains('dark-mode')) {
+    this.innerHTML = "Light Mode";
+  } else {
+    this.innerHTML = "Dark Mode";
+  }
+});
+
 function toggleExerciseInput(show) {
   const ele = document.getElementById('exercise-hours');
   ele.classList.toggle('hidden', !show);
@@ -145,13 +156,13 @@ document.querySelectorAll("input, select").forEach(el => {
 
 
 // submitBtn.addEventListener('click', () => {
-  // if (!validateInputs()) {
-    // return;
-  // }
-  // For example, saving to localStorage or jumping to
-  // alert("Congratulations! The data has been submitted!");
-  // Clear form after user submits data
-  // clearForm();
+// if (!validateInputs()) {
+// return;
+// }
+// For example, saving to localStorage or jumping to
+// alert("Congratulations! The data has been submitted!");
+// Clear form after user submits data
+// clearForm();
 // });
 
 submitBtn.addEventListener('click', () => {
@@ -183,7 +194,7 @@ submitBtn.addEventListener('click', () => {
     .then(result => {
       if (result.status === 'success') {
         alert("Congratulations! The data has been submitted!");
-        clearForm(); 
+        clearForm();
         window.location.href = "/daily_output";  // Jump to daily_output after successful submission
       } else {
         alert("Submission failed: " + result.message);
