@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | LifeTracker</title>
 
-    <link href="../static/css/output.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="main-container flex-col">
@@ -15,7 +15,7 @@
             <h1 class="highlighted-heading sm:mr-5">LifeTracker</h1>
             <div class="text-[1rem] xs:text-lg mt-3 sm:mt-0 mx-3 space-x-3 flex sm:items-center sm:justify-center xs:space-x-7">
                 <a href="{{ url_for('home') }}" class="navbar-item">Home</a>
-                <a href="{{ url_for('daily_output') }}" class="navbar-item">Dashboard</a>  <!-- wait for dashboard -->
+                <a href="{{ url_for('dashboard') }}" class="navbar-item">Dashboard</a>
                 <a href="{{ url_for('daily_output') }}" class="navbar-item">Track Progress</a>
                 <a href="{{ url_for('logout') }}" class="navbar-item">Sign Out</a>
             </div>
@@ -23,11 +23,12 @@
 
         <div class="flex items-center space-x-2 mt-[450px] sm:mt-0">
             <label for="rangeToggle">Your Summary</label>
-            <select id="rangeToggle" class="border border-gray-300 outline-none p-1 rounded">
-              <option value="7">Last 7 Days</option>
-              <option value="30">Last 30 Days</option>
+            <select id="rangeToggle" class="border border-gray-300 outline-none p-1 rounded"
+                    onchange="updateCharts(this.value)">
+              <option value="7" {% if current_range == '7' %}selected{% endif %}>Last 7 Days</option>
+              <option value="30" {% if current_range == '30' %}selected{% endif %}>Last 30 Days</option>
             </select>
-          </div>
+        </div>
         
         <div class="w-full h-fit mt-5 px-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div class="bg-white shadow rounded p-4"><canvas id="exercise-chart"></canvas></div>
@@ -39,11 +40,24 @@
 
     <!-- for charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script type="module" src="../static/js/charts/exercise.js"></script>
-    <script type="module" src="../static/js/charts/water-intake.js"></script>
-    <script type="module" src="../static/js/charts/sleep.js"></script>
-    <script type="module" src="../static/js/charts/screen-time.js"></script>
-    <script type="module" src="../static/js/charts/mood.js"></script>
+    <script>
+        // Pass Flask data to JavaScript
+        const chartData = {{ chart_data|tojson|safe }};
+        const dates = {{ dates|tojson|safe }};
+        const range = {{ current_range|tojson|safe }};
+        
+        function updateCharts(range) {
+        window.location.href = "{{ url_for('dashboard') }}?range=" + range;
+    }
+        
+        // Initialize all charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeExerciseChart(chartData.exercise, dates);
+            initializeWaterChart(chartData.water, dates);
+            initializeSleepChart(chartData.sleep, dates);
+            initializeScreenChart(chartData.screen, dates);
+        });
+    </script>
+    <script type="module" src="{{ url_for('static', filename='js/charts/dashboardchart.js') }}"></script>
 </body>
 </html>

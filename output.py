@@ -34,7 +34,6 @@ def generate_bar_chart(data_dict, title, ylabel):
     plt.close(fig)
     return f"data:image/png;base64,{chart_data}"
 
-# Generate a pie chart (screen time vs activity time)
 def generate_pie_chart(screen, active):
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.pie([screen, active], labels=['Screen', 'Active'], autopct='%1.1f%%', colors=['#ff9999','#99ff99'])
@@ -45,6 +44,7 @@ def generate_pie_chart(screen, active):
     chart_data = base64.b64encode(buf.read()).decode('utf-8')
     plt.close(fig)
     return f"data:image/png;base64,{chart_data}"
+
 
 
 
