@@ -1,18 +1,47 @@
-// Switch between dark and light mode
-document.getElementById('darkModeToggle').addEventListener('click', function () {
-  document.body.classList.toggle('dark-mode');
+// This feature is implemented so that only one question appears on the page at a time.
+// After answering one question then jump to another.
 
-  if (document.body.classList.contains('dark-mode')) {
-    this.innerHTML = "Light Mode";
-  } else {
-    this.innerHTML = "Dark Mode";
-  }
+// Here the currentQuestion index starts at 0, question 1 indexes 0, 
+// question 2 indexes 1, and so on.
+let currentQuestion = 0;
+const questions = document.querySelectorAll('.question');
+
+function showQuestion(index) {
+  questions.forEach((q, idx) => {
+    q.classList.toggle('hidden', idx !== index);
+  });
+}
+
+showQuestion(currentQuestion);
+
+document.querySelectorAll('.next-btn').forEach((btn, index) => {
+  btn.addEventListener('click', () => {
+    if (currentQuestion < questions.length - 1) {
+      currentQuestion++;
+      showQuestion(currentQuestion);
+    } else {
+      document.querySelector('.form-section').classList.add('hidden');
+      document.querySelector('.submit').classList.remove('hidden');
+    }
+  });
 });
 
 function toggleExerciseInput(show) {
-  const ele = document.getElementById('exercise-hours');
-  ele.classList.toggle('hidden', !show);
+  const q2 = document.getElementById('q2');
+  if (show) {
+    currentQuestion = 1;
+  } else {
+    currentQuestion = 2;
+  }
+  showQuestion(currentQuestion);
 }
+
+document.querySelector('.submit').classList.add('hidden');
+
+document.getElementById('darkModeToggle').addEventListener('click', function () {
+  document.body.classList.toggle('dark-mode');
+  this.innerHTML = document.body.classList.contains('dark-mode') ? "Light Mode" : "Dark Mode";
+});
 
 const checkbox = document.getElementById('agreeCheck');
 const submitBtn = document.getElementById('submitBtn');
@@ -22,14 +51,15 @@ checkbox.addEventListener('change', () => {
 });
 
 function validateInputs() {
-  const sleep = parseFloat(document.getElementById('sleepInput').value);
-  const device = parseFloat(document.getElementById('deviceInput').value);
-  const water = parseFloat(document.getElementById('waterInput').value);
-  const reading = parseFloat(document.getElementById('readingInput').value);
-  const eat = parseFloat(document.getElementById('eatInput').value);
+  const sleep = parseFloat(document.getElementById('sleep_hours').value);
+  const device = parseFloat(document.getElementById('screen_hours').value);
+  const water = parseFloat(document.getElementById('water_intake').value);
+  const reading = parseFloat(document.getElementById('reading_hours').value);
+  const eat = parseFloat(document.getElementById('meals').value);
   const exerciseRadio = document.querySelector('input[name="exercise"]:checked');
-  const exerciseVal = exerciseRadio && exerciseRadio.value === 'yes' ?
-    parseFloat(document.getElementById('exerciseInput').value) : null;
+  const exerciseVal = exerciseRadio && exerciseRadio.value === 'yes'
+    ? parseFloat(document.getElementById('exercise_hours').value)
+    : null;
 
   if (sleep > 24 || sleep < 0) {
     alert("Sleep time must be between 0 and 24 hours.");
@@ -57,13 +87,13 @@ function validateInputs() {
 // The following are new additions. The purpose is to realize the retention of the user's input record when refreshing the page
 function saveToLocal() {
   const fields = [
-    'exerciseInput',
-    'waterInput',
-    'sleepInput',
-    'readingInput',
-    'eatInput',
-    'deviceInput',
-    'productivityInput',
+    'exercise_hours',
+    'water_intake',
+    'sleep_hours',
+    'reading_hours',
+    'meals',
+    'screen_hours',
+    'productivity',
   ];
 
   fields.forEach(id => {
@@ -87,13 +117,13 @@ function saveToLocal() {
 
 function loadFromLocal() {
   const fields = [
-    'exerciseInput',
-    'waterInput',
-    'sleepInput',
-    'readingInput',
-    'eatInput',
-    'deviceInput',
-    'productivityInput',
+    'exercise_hours',
+    'water_intake',
+    'sleep_hours',
+    'reading_hours',
+    'meals',
+    'screen_hours',
+    'productivity',
   ];
 
   fields.forEach(id => {
@@ -102,13 +132,13 @@ function loadFromLocal() {
     if (el && val !== null) el.value = val;
   });
 
-  // // Restore radio: exercise
+  // Restore radio: exercise
   const exerciseValue = localStorage.getItem("exerciseRadio");
   if (exerciseValue) {
     const ex = document.querySelector(`input[name="exercise"][value="${exerciseValue}"]`);
     if (ex) {
       ex.checked = true;
-      toggleExerciseInput(exerciseValue === "yes"); // show/hide exercise time input
+      // Don't call toggleExerciseInput here to avoid jumping to q2 or q3
     }
   }
 
@@ -118,19 +148,22 @@ function loadFromLocal() {
     const m = document.querySelector(`input[name="mood"][value="${moodValue}"]`);
     if (m) m.checked = true;
   }
+
+  // Always start from q1 regardless of saved inputs
+  showQuestion(currentQuestion);
 }
 
 
 // New function. Clear page after submitting data
 function clearForm() {
   const fields = [
-    "exerciseInput",
-    "waterInput",
-    "sleepInput",
-    "readingInput",
-    "eatInput",
-    "deviceInput",
-    "productivityInput"
+    'exercise_hours',
+    'water_intake',
+    'sleep_hours',
+    'reading_hours',
+    'meals',
+    'screen_hours',
+    'productivity'
   ];
 
   fields.forEach((id) => {
@@ -154,17 +187,6 @@ document.querySelectorAll("input, select").forEach(el => {
   el.addEventListener("input", saveToLocal);
 });
 
-
-// submitBtn.addEventListener('click', () => {
-// if (!validateInputs()) {
-// return;
-// }
-// For example, saving to localStorage or jumping to
-// alert("Congratulations! The data has been submitted!");
-// Clear form after user submits data
-// clearForm();
-// });
-
 submitBtn.addEventListener('click', () => {
   if (!validateInputs()) {
     return;
@@ -173,13 +195,13 @@ submitBtn.addEventListener('click', () => {
   // Collect data from the form
   const data = {
     exercise: document.querySelector('input[name="exercise"]:checked')?.value || "no",
-    exercise_hours: document.getElementById('exerciseInput')?.value || "0",
-    water_intake: document.getElementById('waterInput')?.value,
-    sleep_hours: document.getElementById('sleepInput')?.value,
-    reading_hours: document.getElementById('readingInput')?.value,
-    meals: document.getElementById('eatInput')?.value,
-    screen_hours: document.getElementById('deviceInput')?.value,
-    productivity: document.getElementById('productivityInput')?.value,
+    exercise_hours: document.getElementById('exercise_hours')?.value || "0",
+    water_intake: document.getElementById('water_intake')?.value,
+    sleep_hours: document.getElementById('sleep_hours')?.value,
+    reading_hours: document.getElementById('reading_hours')?.value,
+    meals: document.getElementById('meals')?.value,
+    screen_hours: document.getElementById('screen_hours')?.value,
+    productivity: document.getElementById('productivity')?.value,
     mood: document.querySelector('input[name="mood"]:checked')?.value || ""
   };
 

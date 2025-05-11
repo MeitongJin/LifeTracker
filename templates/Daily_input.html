@@ -29,6 +29,7 @@
     .dark-mode .form-control,
     .dark-mode .form-select {
       background-color: #c5d0df;
+      /* The color of the font in the input box is yellow */
       color: yellow;
       border-color: #6b7280;
     }
@@ -44,6 +45,7 @@
     }
 
     .dark-mode label {
+      /* The font color for form questions is red. */
       color: red;
     }
 
@@ -57,6 +59,15 @@
 
     .dark-mode .tooltip {
       color: #e5e7eb;
+    }
+
+    .tooltip {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .relative:hover .tooltip {
+      opacity: 1;
     }
   </style>
 </head>
@@ -74,8 +85,9 @@
         <form id="dailyForm">
           <!-- Physical health component -->
           <h2 class="text-xl font-semibold mb-4">🔹 Physical Metrics</h2>
-          <div class="mb-3">
-            <label class="form-label">Did you exercise?</label><br>
+          <div class="mb-3 question" id="q1">
+            <label class="form-label">Did you exercise?</label>
+            <br>
             <div class="form-check-inline">
               <input class="form-check-input" type="radio" name="exercise" value="yes"
                 onclick="toggleExerciseInput(true)">
@@ -88,41 +100,51 @@
             </div>
           </div>
 
-          <div class="mb-3 hidden" id="exercise-hours">
+          <div class="mb-3 question hidden" id="q2">
             <label class="form-label">If yes, how many hours did you spend on exercising?</label>
             <input type="number" name="exerciseHour" class="form-control" min="0" step="0.1" id="exercise_hours">
+            <!-- Added a Next button -->
+            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-3 question hidden" id="q3">
             <label class="form-label">How much water did you drink? (L)</label>
             <input type="number" name="waterIntake" class="form-control" min="0" step="0.1" id="water_intake">
+            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-3 question hidden relative" id="q4">
             <label class="form-label">How many hours did you sleep?</label>
             <input type="number" name="sleepHour" class="form-control" min="0" step="0.1" id="sleep_hours">
+            <!-- Dynamic prompts to fill in criteria or suggestions when the mouse hovers next to the input box. -->
+            <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 7-9 hrs</span>
+            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
           </div>
 
           <!-- Growing up and living part -->
           <h2 class="text-xl font-semibold mb-4">🔹 Growth & Habits</h2>
-          <div class="mb-3">
+          <div class="mb-3 question hidden" id="q5">
             <label class="form-label">How much time did you spend reading? (hrs)</label>
             <input type="number" name="readingHour" class="form-control" min="0" step="0.1" id="reading_hours">
+            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-3 question hidden" id="q6">
             <label class="form-label">How many times did you eat today?</label>
             <input type="number" name="mealNum" class="form-control" min="0" step="0.1" id="meals">
+            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-3 question hidden relative" id="q7">
             <label class="form-label">How many hours did you spend on mobile phone/computer?</label>
             <input type="number" name="deviceHour" class="form-control" min="0" step="0.1" id="screen_hours">
+            <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 4-6 hrs</span>
+            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
           </div>
 
           <!-- Feeling part -->
           <h2 class="text-xl font-semibold mb-4">🔹 Feelings & Productivity</h2>
-          <div class="mb-3">
+          <div class="mb-3 question hidden" id="q8">
             <label class="form-label">How productive was your day? (1-10)</label>
             <select class="form-select" name="productivityNum" id="productivity">
               <option selected disabled>Select</option>
@@ -137,9 +159,10 @@
               <option>9</option>
               <option>10</option>
             </select>
+            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-3 question hidden" id="q9">
             <label class="form-label">How is your mood today?</label>
             <div class="emoji-select ">
               <label class="text-base space-x-2"><input type="radio" name="mood" value="happy"><span
@@ -154,12 +177,13 @@
               <label class="space-x-2"><input type="radio" name="mood" value="angry"><span
                   class="text-2xl">&#128544;</span></label>
             </div>
+            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
           </div>
         </form>
       </div>
 
       <!-- Submission area -->
-      <div class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+      <div class="submit max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
         <h2 class="text-2xl font-bold mb-4 text-center">📌 Pre-Submission Disclaimer & Notes</h2>
 
         <div class="text-gray-800 text-sm space-y-3 h-60 overflow-y-auto border p-4 rounded">
@@ -188,13 +212,14 @@
     </div>
   </div>
 
+  <!-- Using external js files -->
   <script src="../static/js/Click&Hide.js"></script>
 
   <script>
     // Control exercise input display
-    function toggleExerciseInput(show) {
-      document.getElementById('exercise-hours').classList.toggle('hidden', !show);
-    }
+    // function toggleExerciseInput(show) {
+    //   document.getElementById('exercise-hours').classList.toggle('hidden', !show);
+    // }
 
     // Enable the submit button only when the checkbox is checked
     document.getElementById('agreeCheck').addEventListener('change', function () {
