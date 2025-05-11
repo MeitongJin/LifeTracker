@@ -345,17 +345,35 @@ def submit():
         return jsonify({'status': 'error', 'message': str(e)}), 500
     
 # Output Route
-@app.route('/daily_output')
+@app.route('/daily_output', methods=['GET'])
 def daily_output():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
     user_id = session['user_id']
-    records = get_past_week_inputs(user_id)
+    selected_date = request.args.get('selected_date')
+
+    if selected_date:
+        try:
+            selected_date_obj = datetime.strptime(selected_date, '%Y-%m-%d').date()
+            # Fetch records for the selected date only
+            records = UserInput.query.filter(
+                UserInput.user_id == user_id,
+                UserInput.date == selected_date_obj
+            ).all()
+        except ValueError:
+            records = []  # Invalid date format fallback
+    else:
+        # No date selected: fetch all records up to today (or past week if preferred)
+        records = UserInput.query.filter(
+            UserInput.user_id == user_id,
+            UserInput.date <= datetime.today().date()
+        ).order_by(UserInput.date).all()
 
     if not records:
-        return render_template("Daily_output.html", message="No data found.")
+        return render_template("Daily_output.html", message="No data found.", selected_date=selected_date or "")
 
+    # Prepare data for the charts
     df = pd.DataFrame([{
         "date": r.date.strftime('%Y-%m-%d'),
         "exercise": 1 if r.exercise == "yes" else 0,
@@ -370,15 +388,28 @@ def daily_output():
 
     df.set_index("date", inplace=True)
 
-    exercise_chart = generate_bar_chart(df["exercise_hours"].to_dict(), "Exercise Hours", "Hours")
-    water_chart = generate_bar_chart(df["water"].to_dict(), "Water Intake", "Litres")
-    sleep_chart = generate_bar_chart(df["sleep"].to_dict(), "Sleep Hours", "Hours")
-    screen_vs_active = generate_pie_chart(df["screen"].sum(), max(0.1, df["exercise_hours"].sum() + df["reading"].sum()))
+    # Generate chart data
+    exercise_labels = df.index.tolist()
+    exercise_data = df["exercise_hours"].tolist()
+    water_labels = df.index.tolist()
+    water_data = df["water"].tolist()
+    sleep_labels = df.index.tolist()
+    sleep_data = df["sleep"].tolist()
+    screen_labels = df.index.tolist()
+    screen_data = df["screen"].tolist()
+
+    # Generate charts as base64 strings
+    exercise_chart = generate_bar_chart(dict(zip(exercise_labels, exercise_data)), "Exercise Hours", "Hours")
+    water_chart = generate_bar_chart(dict(zip(water_labels, water_data)), "Water Intake", "Litres")
+    sleep_chart = generate_bar_chart(dict(zip(sleep_labels, sleep_data)), "Sleep Hours", "Hours")
+    screen_vs_active = generate_pie_chart(sum(screen_data), max(0.1, sum(df["exercise_hours"]) + sum(df["reading"])))
 
     streak = int(df["exercise"].sum())
     water_avg = df["water"].mean()
     sleep_avg = df["sleep"].mean()
     reading_total = int(df["reading"].sum() * 60)
+    reading_today = df.iloc[-1]["reading"] if not df.empty else 0
+
     sleep_warning = sleep_avg < 7
     summary = (
         f"You exercised {df['exercise'].sum()} times, "
@@ -395,8 +426,21 @@ def daily_output():
                            water_avg=f"{water_avg:.1f}",
                            sleep_avg=f"{sleep_avg:.1f}",
                            reading_total=reading_total,
+                           reading_hours=reading_today,
                            sleep_warning=sleep_warning,
-                           summary=summary)
+                           summary=summary, 
+                           user_name=session.get('user_name'),
+                           exercise_labels=exercise_labels,
+                           exercise_data=exercise_data,
+                           water_labels=water_labels,
+                           water_data=water_data,
+                           sleep_labels=sleep_labels,
+                           sleep_data=sleep_data,
+                           screen_labels=screen_labels,
+                           screen_data=screen_data,
+                           selected_date=selected_date)
+
+
 
 @app.route('/dashboard')
 def dashboard():
