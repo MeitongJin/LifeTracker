@@ -1,27 +1,26 @@
-fetch('../../../data/user-data.json')
-  .then(res => res.json())
-  .then(data => {
-    new Chart(document.getElementById('water-intake-chart'), {
+export function initializeWaterChart(data, labels) {
+  const ctx = document.getElementById('water-intake-chart').getContext('2d');
+  new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.water_data.map(d => d.date),
-        datasets: [{
-          label: 'Water Intake (liters)',
-          data: data.water_data.map(d => d.liters),
-          backgroundColor: 'gray',
-          borderColor: 'gray',
-          fill: true
-        }]
+          labels: labels,
+          datasets: [{
+              label: 'Water Intake (L)',
+              data: data,
+              borderColor: '#4B9CD3',
+              fill: false,
+              tension: 0.1
+          }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Water Intake'
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+              title: {
+                  display: true,
+                  text: 'Water Intake Over Time'
+              }
           }
-        }
       }
-    });
   });
+}

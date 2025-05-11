@@ -1,27 +1,26 @@
-fetch('../../../data/user-data.json')
-  .then(res => res.json())
-  .then(data => {
-    new Chart(document.getElementById('sleep-chart'), {
+export function initializeSleepChart(data, labels) {
+  const ctx = document.getElementById('sleep-chart').getContext('2d');
+  new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.sleep_data.map(d => d.date),
-        datasets: [{
-          label: 'Sleep Duration (hrs)',
-          data: data.sleep_data.map(d => d.hours),
-          backgroundColor: 'gray',
-          borderColor: 'grey',
-          fill: true
-        }]
+          labels: labels,
+          datasets: [{
+              label: 'Sleep Hours',
+              data: data,
+              borderColor: '#6F42C1',
+              fill: false,
+              tension: 0.1
+          }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Sleep Hours'
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+              title: {
+                  display: true,
+                  text: 'Sleep Hours Over Time'
+              }
           }
-        }
       }
-    });
   });
+}

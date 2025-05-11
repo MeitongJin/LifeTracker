@@ -1,15 +1,23 @@
 @import "tailwindcss";
 
-.container{
-    @apply h-screen flex justify-center items-center bg-gray-200 text-gray-800;
+@theme {
+  --breakpoint-xs: 27rem;
+}
+
+body {
+    @apply bg-gray-200 text-gray-800;
+}
+
+.main-container{
+    @apply h-screen flex justify-center items-center;
 }
 
 .btn {
-    @apply bg-gray-700 text-white flex items-center justify-center font-semibold py-2 px-6 w-fit h-10 my-3 rounded-full hover:bg-gray-600 hover:cursor-pointer;
+    @apply bg-gray-700 text-white self-center flex items-center justify-center font-semibold py-2 px-6 w-fit h-10 my-3 rounded-full hover:bg-gray-600 hover:cursor-pointer;
 }
 
 .auth-form {
-    @apply w-[400px] flex flex-col justify-center items-center border border-gray-200 rounded-sm px-5 py-5 shadow-xl;
+    @apply w-[90%] xs:w-[450px] 2xl:w-[475px] flex flex-col justify-center items-center border border-gray-200 rounded-sm px-5 py-5 shadow-xl;
 }
 
 .form-input{
@@ -17,13 +25,13 @@
 }
 
 .auth-form-heading{
-    @apply my-2 text-2xl font-serif;
+    @apply my-2 text-xl xs:text-2xl font-serif;
 }
 
 .highlighted-heading{
-    @apply text-gray-700 text-4xl italic;
+    @apply text-gray-700 text-2xl xs:text-4xl italic;
 }
 
 .navbar-item{
-    @apply hover:underline hover:text-gray-600;
+    @apply hover:underline hover:text-gray-600 text-nowrap;
 }
