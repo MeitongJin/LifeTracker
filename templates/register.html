@@ -12,7 +12,7 @@
   <title>Register</title>
 </head>
 <body>
-  <div class="container">
+  <div class="main-container">
     <form class="auth-form" method="POST" action="{{ url_for('register') }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <p class="auth-form-heading">Register at <span class="highlighted-heading">LifeTracker</span></p>

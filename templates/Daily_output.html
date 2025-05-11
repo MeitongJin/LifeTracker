@@ -2,82 +2,281 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LifeTracker --- Output</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LifeTracker Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      /* Use a gradient for the background color. */
-      background: linear-gradient(to bottom, #bdc3c7, #2c3e50);
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .section-title {
+        font-size: 1.25rem;
+      }
+    }
+
+    /* Animation on chart load */
+    .animate-chart {
+      animation: chartLoad 2s ease-out;
+    }
+
+    @keyframes chartLoad {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
     }
   </style>
 </head>
 
-<body class="p-8 bg-gray-100">
-  <div class="output-section bg-white rounded-xl p-8 shadow-md mb-10">
-    <h2 class="mb-3 text-2xl font-semibold">LifeTracker --- Summary Output</h2>
-    
-    <!-- When data is empty -->
-    {% if message %}
-      <div class="alert alert-warning text-center text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 p-3 mb-5 rounded">
+<body class="p-4 md:p-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-xl md:text-2xl font-semibold text-gray-700">
+        Hey, {{ user_name }}!
+      </h1>
+      <a href="{{ url_for('logout') }}" class="text-sm text-gray-600 hover:underline font-bold">Sign Out</a>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="mb-6 flex gap-4 text-sm text-gray-600">
+      <a href="{{ url_for('home') }}" class="hover:text-black font-bold">Home</a>
+      <a href="{{ url_for('daily_input') }}" class="hover:text-black font-bold">Add Entry</a>
+      <a href="{{ url_for('dashboard') }}" class="hover:text-black font-bold">Dashboard</a>
+    </nav>
+
+    <div class="output-section bg-white rounded-2xl p-6 md:p-8 shadow-xl mb-10">
+      <!-- Title and Date Picker -->
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Track your Progress</h2>
+        <form method="GET" action="{{ url_for('daily_output') }}" class="date-selector flex items-center gap-2">
+          <input type="date" name="selected_date" value="{{ selected_date or '' }}" class="border rounded-lg px-3 py-1 text-sm" />
+          <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-600">Go</button>
+        </form>
+      </div>
+
+      <!-- Message Alert -->
+      {% if message %}
+      <div class="alert alert-warning text-center text-yellow-700 bg-yellow-50 border border-yellow-200 p-4 mb-6 rounded-lg">
         {{ message }}
       </div>
-    {% endif %}
-    
-    <!-- Exercise -->
-    <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-      <h5 class="text-lg font-semibold mb-4">🏃 Exercise</h5>
-      <p class="mb-3">{{ streak }}-day Streak</p>
-      <div class="bg-gray-100 rounded">
-        <img src="{{ exercise_chart }}" alt="Exercise Chart" class="rounded w-full h-52 object-contain" />
-      </div>
-    </div>
-    
-    <!-- Water -->
-    <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-      <h5 class="text-xl font-semibold mb-4">💧 Water Consumption</h5>
-      <div class="bg-gray-100 rounded">
-        <img src="{{ water_chart }}" alt="Water Chart" class="rounded w-full h-52 object-contain" />
-      </div>
-      <p class="mt-3">Average water consumption this week: {{ water_avg }}L</p>
-    </div>
-
-    <!-- Sleep -->
-    <div class="card border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-      <h5 class="text-xl font-semibold mb-4">😴 Sleep</h5>
-      <div class="bg-gray-100 rounded">
-        <img src="{{ sleep_chart }}" alt="Sleep Chart" class="rounded w-full h-52 object-contain" />
-      </div>
-      <p class="mt-3">Weekly Average: {{ sleep_avg }} hrs</p>
-      {% if sleep_warning %}
-      <div class="low-sleep bg-red-100 text-red-700 p-2 mt-3 border-l-4 border-red-500 rounded">
-        Warning: Below recommended 7h/day
-      </div>
       {% endif %}
-    </div>
 
-    <!-- Reading -->
-    <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-      <h5 class="text-xl font-semibold mb-4">📚 Reading Time</h5>
-      <p>Total reading time this month: {{ reading_total }} mins</p>
-    </div>
+      <!-- Cards Section -->
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <!-- Exercise (Bar Chart) -->
+        <div class="border border-gray-200 rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-white card-hover">
+          <div class="flex justify-between items-start mb-3">
+            <h5 class="text-lg font-bold text-gray-700 flex items-center gap-2">
+              <span class="bg-blue-100 p-2 rounded-full">🏃</span>
+              Exercise
+            </h5>
+            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+              {{ streak or 0 }}-day Streak
+            </span>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-2">
+            <canvas id="exerciseChart" class="animate-chart w-full h-48"></canvas>
+          </div>
+          <div class="mt-3 flex justify-between text-sm text-gray-600">
+            <span>Goal: 2hr/day</span>
+          </div>
+        </div>
 
-    <!-- Screen -->
-    <div class="border border-gray-300 rounded-2xl p-5 mb-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-      <h5 class="text-xl font-semibold mb-4">📱 Screen Time</h5>
-      <div class="bg-gray-100 rounded">
-        <img src="{{ screen_chart }}" alt="Screen Pie Chart" class="rounded w-full h-52 object-contain" />
+        <!-- Water (Doughnut Chart) -->
+        <div class="border border-gray-200 rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-white card-hover">
+          <h5 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-3">
+            <span class="bg-blue-100 p-2 rounded-full">💧</span>
+            Water Consumption
+          </h5>
+          <div class="bg-gray-50 rounded-lg p-2">
+            <canvas id="waterChart" class="animate-chart w-full h-48"></canvas>
+          </div>
+          <div class="mt-4 flex justify-between items-center">
+            <div>
+              <p class="text-sm text-gray-500">Weekly Average</p>
+              <p class="text-xl font-bold">{{ water_avg or "0.0" }}<span class="text-sm font-normal text-gray-500">L/day</span></p>
+            </div>
+            <div class="w-24 h-2 bg-gray-200 rounded-full">
+              <div class="h-full bg-blue-500 rounded-full" style="width: 80%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sleep (Line Chart) -->
+        <div class="border border-gray-200 rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-white card-hover">
+          <h5 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-3">
+            <span class="bg-purple-100 p-2 rounded-full">😴</span>
+            Sleep
+          </h5>
+          <div class="bg-gray-50 rounded-lg p-2">
+            <canvas id="sleepChart" class="animate-chart w-full h-48"></canvas>
+          </div>
+          <p class="mt-3 text-sm text-gray-700">Weekly Average: {{ sleep_avg or "0" }} hrs</p>
+          {% if sleep_warning %}
+          <div class="bg-red-100 text-red-700 mt-3 p-3 border-l-4 border-red-500 rounded">
+            Warning: Below recommended 7h/day
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Screen Time (Pie Chart) -->
+        <div class="border border-gray-200 rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-white card-hover">
+          <h5 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-3">
+            <span class="bg-pink-100 p-2 rounded-full">📱</span>
+            Screen Time
+          </h5>
+          <div class="bg-gray-50 rounded-lg p-2">
+            <canvas id="screenChart" class="animate-chart w-full h-48"></canvas>
+          </div>
+        </div>
+
+        <!-- Reading Progress (Circular Progress) -->
+        <div class="border border-gray-200 rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-white card-hover col-span-2">
+          <h5 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-3">
+            <span class="bg-yellow-100 p-2 rounded-full">📚</span>
+            Reading Progress
+          </h5>
+          <div class="flex items-center justify-center mt-4">
+            <svg class="w-24 h-24">
+              <circle cx="50%" cy="50%" r="36" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+              <circle cx="50%" cy="50%" r="36" stroke="#facc15" stroke-width="8" fill="none"
+                      stroke-dasharray="226.2" stroke-dashoffset="{{ 226.2 - (reading_hours / 1.0 * 226.2) }}"
+                      stroke-linecap="round" transform="rotate(-90 48 48)" />
+            </svg>
+          </div>
+          <p class="mt-3 text-center text-gray-600 text-sm">
+            You’ve read <strong>{{ reading_hours or 0 }}</strong> hour{{ 's' if reading_hours != 1 else '' }} today.
+          </p>
+          <p class="text-center text-gray-700 text-sm mt-1">
+            Total till today: <strong>{{ reading_total or 0 }}</strong> hour{{ 's' if reading_total != 1 else '' }}
+          </p>
+        </div>
+      </div> 
+
+      <!-- Weekly Summary -->
+      <div class="border border-gray-200 rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-white card-hover">
+        <h5 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-3">
+          <span class="bg-gray-200 p-2 rounded-full">📝</span>
+          Weekly Summary
+        </h5>
+        <p class="text-gray-700 text-sm">{{ summary or "No summary available." }}</p>
       </div>
     </div>
 
-    <!-- Weekly Summary -->
-    <div class="border border-gray-300 rounded-2xl p-5 shadow-[0_2px_5px_rgba(0,0,0,0.4)]">
-      <h5 class="text-xl font-semibold mb-4">Weekly Summary</h5>
-      <p>{{ summary }}</p> 
-    </div>
+    <!-- Footer -->
+    <footer class="mt-10 text-center text-sm text-gray-500">
+      &copy; 2025 LifeTracker — Designed to help you grow.
+    </footer>
   </div>
-</body>
 
-</html>
+  <!-- JavaScript for Chart Interactivity and Animation -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const exerciseCtx = document.getElementById('exerciseChart').getContext('2d');
+        const waterCtx = document.getElementById('waterChart').getContext('2d');
+        const sleepCtx = document.getElementById('sleepChart').getContext('2d');
+        const screenCtx = document.getElementById('screenChart').getContext('2d');
+
+        const exerciseData = {
+            labels: {{ exercise_labels | tojson }},
+            datasets: [{
+                label: 'Exercise (hours)',
+                data: {{ exercise_data | tojson }},
+                backgroundColor: '#4caf50',
+            }]
+        };
+
+        const waterData = {
+            labels: {{ water_labels | tojson }},
+            datasets: [{
+                label: 'Water (liters)',
+                data: {{ water_data | tojson }},
+                borderColor: '#42a5f5',
+                backgroundColor: 'rgba(66, 165, 245, 0.2)',
+                fill: true,
+            }]
+        };
+
+        const sleepData = {
+            labels: {{ sleep_labels | tojson }},
+            datasets: [{
+                label: 'Sleep (hours)',
+                data: {{ sleep_data | tojson }},
+                borderColor: '#ffeb3b',
+                backgroundColor: 'rgba(255, 235, 59, 0.2)',
+                fill: true,
+            }]
+        };
+
+        const screenData = {
+            labels: {{ screen_labels | tojson }},
+            datasets: [{
+                label: 'Screen Time (hours)',
+                data: {{ screen_data | tojson }},
+                borderColor: '#e91e63',
+                backgroundColor: 'rgba(233, 30, 99, 0.2)',
+                fill: true,
+            }]
+        };
+
+        // Exercise Chart (Bar chart)
+        new Chart(exerciseCtx, {
+            type: 'bar',
+            data: exerciseData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Water Chart (Doughnut chart)
+        new Chart(waterCtx, {
+            type: 'doughnut',
+            data: waterData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+
+        // Sleep Chart (Line chart)
+        new Chart(sleepCtx, {
+            type: 'line',
+            data: sleepData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+
+        // Screen Time Chart (Pie chart)
+        new Chart(screenCtx, {
+            type: 'pie',
+            data: screenData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    });
+</script>
+</body>
+</html>  

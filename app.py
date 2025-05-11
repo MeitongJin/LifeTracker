@@ -17,6 +17,8 @@ from extensions import db, csrf
 from models import User, UserInput
 from input import to_float, to_int
 from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 
@@ -57,6 +59,32 @@ This code will expire in 10 minutes."""
     except Exception as e:
         print(f"Failed to send email: {str(e)}")  # Detailed error logging
         return False
+    
+def get_user_inputs(user_id, days=7):
+    """Get user inputs for specified number of days"""
+    end_date = datetime.now().date()
+    start_date = end_date - timedelta(days=days-1)
+    
+    return UserInput.query.filter(
+        UserInput.user_id == user_id,
+        UserInput.date >= start_date,
+        UserInput.date <= end_date
+    ).order_by(UserInput.date).all()
+
+def prepare_exercise_data(records):
+    return {
+        'hours': [r.exercise_hours or 0 for r in records],
+        'days': [r.exercise == 'yes' for r in records]
+    }
+
+def prepare_water_data(records):
+    return [r.water_intake or 0 for r in records]
+
+def prepare_sleep_data(records):
+    return [r.sleep_hours or 0 for r in records]
+
+def prepare_screen_data(records):
+    return [r.screen_hours or 0 for r in records]
     
 # Initialize extensions
 db.init_app(app)
@@ -317,17 +345,35 @@ def submit():
         return jsonify({'status': 'error', 'message': str(e)}), 500
     
 # Output Route
-@app.route('/daily_output')
+@app.route('/daily_output', methods=['GET'])
 def daily_output():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
     user_id = session['user_id']
-    records = get_past_week_inputs(user_id)
+    selected_date = request.args.get('selected_date')
+
+    if selected_date:
+        try:
+            selected_date_obj = datetime.strptime(selected_date, '%Y-%m-%d').date()
+            # Fetch records for the selected date only
+            records = UserInput.query.filter(
+                UserInput.user_id == user_id,
+                UserInput.date == selected_date_obj
+            ).all()
+        except ValueError:
+            records = []  # Invalid date format fallback
+    else:
+        # No date selected: fetch all records up to today (or past week if preferred)
+        records = UserInput.query.filter(
+            UserInput.user_id == user_id,
+            UserInput.date <= datetime.today().date()
+        ).order_by(UserInput.date).all()
 
     if not records:
-        return render_template("Daily_output.html", message="No data found.")
+        return render_template("Daily_output.html", message="No data found.", selected_date=selected_date or "")
 
+    # Prepare data for the charts
     df = pd.DataFrame([{
         "date": r.date.strftime('%Y-%m-%d'),
         "exercise": 1 if r.exercise == "yes" else 0,
@@ -342,15 +388,28 @@ def daily_output():
 
     df.set_index("date", inplace=True)
 
-    exercise_chart = generate_bar_chart(df["exercise_hours"].to_dict(), "Exercise Hours", "Hours")
-    water_chart = generate_bar_chart(df["water"].to_dict(), "Water Intake", "Litres")
-    sleep_chart = generate_bar_chart(df["sleep"].to_dict(), "Sleep Hours", "Hours")
-    screen_vs_active = generate_pie_chart(df["screen"].sum(), max(0.1, df["exercise_hours"].sum() + df["reading"].sum()))
+    # Generate chart data
+    exercise_labels = df.index.tolist()
+    exercise_data = df["exercise_hours"].tolist()
+    water_labels = df.index.tolist()
+    water_data = df["water"].tolist()
+    sleep_labels = df.index.tolist()
+    sleep_data = df["sleep"].tolist()
+    screen_labels = df.index.tolist()
+    screen_data = df["screen"].tolist()
+
+    # Generate charts as base64 strings
+    exercise_chart = generate_bar_chart(dict(zip(exercise_labels, exercise_data)), "Exercise Hours", "Hours")
+    water_chart = generate_bar_chart(dict(zip(water_labels, water_data)), "Water Intake", "Litres")
+    sleep_chart = generate_bar_chart(dict(zip(sleep_labels, sleep_data)), "Sleep Hours", "Hours")
+    screen_vs_active = generate_pie_chart(sum(screen_data), max(0.1, sum(df["exercise_hours"]) + sum(df["reading"])))
 
     streak = int(df["exercise"].sum())
     water_avg = df["water"].mean()
     sleep_avg = df["sleep"].mean()
     reading_total = int(df["reading"].sum() * 60)
+    reading_today = df.iloc[-1]["reading"] if not df.empty else 0
+
     sleep_warning = sleep_avg < 7
     summary = (
         f"You exercised {df['exercise'].sum()} times, "
@@ -367,8 +426,49 @@ def daily_output():
                            water_avg=f"{water_avg:.1f}",
                            sleep_avg=f"{sleep_avg:.1f}",
                            reading_total=reading_total,
+                           reading_hours=reading_today,
                            sleep_warning=sleep_warning,
-                           summary=summary)
+                           summary=summary, 
+                           user_name=session.get('user_name'),
+                           exercise_labels=exercise_labels,
+                           exercise_data=exercise_data,
+                           water_labels=water_labels,
+                           water_data=water_data,
+                           sleep_labels=sleep_labels,
+                           sleep_data=sleep_data,
+                           screen_labels=screen_labels,
+                           screen_data=screen_data,
+                           selected_date=selected_date)
+
+
+
+@app.route('/dashboard')
+def dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    # Get the user inputs for the selected range (7 or 30 days)
+    range = request.args.get('range', '7')
+    user_inputs = get_user_inputs(session['user_id'], days=int(range))
+
+    # Prepare the data for the charts
+    exercise_data = prepare_exercise_data(user_inputs)
+    water_data = prepare_water_data(user_inputs)
+    sleep_data = prepare_sleep_data(user_inputs)
+    screen_data = prepare_screen_data(user_inputs)
+    dates = [input.date.strftime('%Y-%m-%d') for input in user_inputs]
+
+    chart_data = {
+        'exercise': exercise_data['hours'],
+        'water': water_data,
+        'sleep': sleep_data,
+        'screen': screen_data
+    }
+
+    return render_template('dashboard.html', 
+                           chart_data=chart_data, 
+                           current_range=range,
+                           dates=dates)
 
 # ResetPassword Clear Session
 @app.route('/clear_reset_session', methods=['POST'])
