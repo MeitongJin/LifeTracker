@@ -8,8 +8,8 @@ from random import randint
 from flask_mail import Mail, Message
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg')  # Prohibit the use of GUI back-end to prevent crashes 
-import matplotlib.pyplot as plt
+# matplotlib.use('Agg')  # Prohibit the use of GUI back-end to prevent crashes 
+# import matplotlib.pyplot as plt
 import io
 import base64
 # Custom modules
