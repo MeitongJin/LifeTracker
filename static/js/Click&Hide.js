@@ -15,6 +15,17 @@ function showQuestion(index) {
 
 showQuestion(currentQuestion);
 
+// Controls the Previous button.
+document.querySelectorAll('.prev-btn').forEach((btn, index) => {
+  btn.addEventListener('click', () => {
+    if (currentQuestion > 0) {
+      currentQuestion--;
+      showQuestion(currentQuestion);
+    }
+  });
+});
+
+// Controls the Next button.
 document.querySelectorAll('.next-btn').forEach((btn, index) => {
   btn.addEventListener('click', () => {
     if (currentQuestion < questions.length - 1) {
