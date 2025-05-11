@@ -4,6 +4,7 @@
 // Here the currentQuestion index starts at 0, question 1 indexes 0, 
 // question 2 indexes 1, and so on.
 let currentQuestion = 0;
+// Get all question elements
 const questions = document.querySelectorAll('.question');
 
 function showQuestion(index) {
@@ -26,6 +27,7 @@ document.querySelectorAll('.next-btn').forEach((btn, index) => {
   });
 });
 
+// Handling of special cases
 function toggleExerciseInput(show) {
   const q2 = document.getElementById('q2');
   if (show) {
@@ -38,6 +40,8 @@ function toggleExerciseInput(show) {
 
 document.querySelector('.submit').classList.add('hidden');
 
+
+// Switch between dark and light mode
 document.getElementById('darkModeToggle').addEventListener('click', function () {
   document.body.classList.toggle('dark-mode');
   this.innerHTML = document.body.classList.contains('dark-mode') ? "Light Mode" : "Dark Mode";
