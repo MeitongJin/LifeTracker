@@ -223,21 +223,17 @@
 
   <!-- Using external js files -->
   <script src="../static/js/Click&Hide.js"></script>
-
   <script>
-    // Control exercise input display
-    // function toggleExerciseInput(show) {
-    //   document.getElementById('exercise-hours').classList.toggle('hidden', !show);
-    // }
+  document.getElementById('submitBtn').addEventListener('click', async function () {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    // Disable button during submission
+    const submitBtn = this;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
 
-    // Enable the submit button only when the checkbox is checked
-    document.getElementById('agreeCheck').addEventListener('change', function () {
-      document.getElementById('submitBtn').disabled = !this.checked;
-    });
-
-    // Submit data
-    document.getElementById('submitBtn').addEventListener('click', async function () {
-      const data = {
+    const data = {
         exercise: document.querySelector('input[name="exercise"]:checked')?.value || 'no',
         exercise_hours: document.getElementById('exercise_hours').value || 0,
         water_intake: document.getElementById('water_intake').value || 0,
@@ -247,33 +243,43 @@
         screen_hours: document.getElementById('screen_hours').value || 0,
         productivity: document.getElementById('productivity').value || 0,
         mood: document.querySelector('input[name="mood"]:checked')?.value || ''
-      };
+    };
 
-      try {
+    try {
         const response = await fetch('/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
 
-        const result = await response.json();
-        alert(result.message);
-
-        if (result.status === 'success') {
-          document.getElementById('dailyForm').reset();
-          document.getElementById('submitBtn').disabled = true;
-          document.getElementById('exercise-hours').classList.add('hidden');
-          // Automatically jump to the daily_output page after submitted
-          window.location.href = "/daily_output";
-
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
         }
-      } catch (error) {
-        alert('Submission failed: ' + error.message);
-      }
-    });
-  </script>
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Submission failed');
+        }
+
+        alert(result.message);
+        window.location.href = "/daily_output";
+    } catch (error) {
+        console.error('Submission error:', error);
+        alert(error.message);
+    } finally {
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit data';
+    }
+});
+</script>
 
 </body>
 

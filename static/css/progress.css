@@ -1,0 +1,28 @@
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .section-title {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Animation on chart load */
+  .animate-chart {
+    animation: chartLoad 2s ease-out;
+  }
+
+  @keyframes chartLoad {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
