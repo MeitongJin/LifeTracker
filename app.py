@@ -8,8 +8,8 @@ from random import randint
 from flask_mail import Mail, Message
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg')  # Prohibit the use of GUI back-end to prevent crashes 
-import matplotlib.pyplot as plt
+# matplotlib.use('Agg')  # Prohibit the use of GUI back-end to prevent crashes 
+# import matplotlib.pyplot as plt
 import io
 import base64
 # Custom modules
@@ -17,7 +17,8 @@ from extensions import db, csrf
 from models import User, UserInput
 from input import to_float, to_int
 from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from sqlalchemy.exc import IntegrityError
 
 
 app = Flask(__name__)
@@ -32,9 +33,12 @@ app.config['MAIL_DEFAULT_SENDER'] = 'team.lifetracker@gmail.com'
 
 mail = Mail(app)
 
-app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.config['SECRET_KEY'] = '96116a385604fce2551eabb56cf90b03'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lifetracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SESSION_COOKIE_SECURE'] = False  # For development (True for production)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -308,7 +312,7 @@ def daily_input():
         return redirect(url_for('login'))
     return render_template('Daily_input.html')
 
-# User Input Submission
+# User Input Submission - Updated to overwrite existing entries
 @app.route('/submit', methods=['POST'])
 @csrf.exempt
 def submit():
@@ -317,31 +321,57 @@ def submit():
         if not user_id:
             return jsonify({'status': 'error', 'message': 'User not logged in'}), 401
 
-        data = request.json
+        # Ensure request is JSON
+        if not request.is_json:
+            return jsonify({'status': 'error', 'message': 'Request must be JSON'}), 400
+
+        data = request.get_json()
         if not data:
             return jsonify({'status': 'error', 'message': 'No data received'}), 400
 
-        record = UserInput(
+        today = date.today()
+        
+        # Check for existing record
+        existing_record = UserInput.query.filter_by(
             user_id=user_id,
-            date=datetime.now().date(),
-            exercise=data.get('exercise'),
-            exercise_hours=to_float(data.get('exercise_hours')),
-            water_intake=to_float(data.get('water_intake')),
-            sleep_hours=to_float(data.get('sleep_hours')),
-            reading_hours=to_float(data.get('reading_hours')),
-            meals=to_int(data.get('meals')),
-            screen_hours=to_float(data.get('screen_hours')),
-            productivity=to_int(data.get('productivity')),
-            mood=data.get('mood')
-        )
+            date=today
+        ).first()
 
-        db.session.add(record)
+        if existing_record:
+            # Update existing record
+            existing_record.exercise = data.get('exercise', existing_record.exercise)
+            existing_record.exercise_hours = to_float(data.get('exercise_hours', existing_record.exercise_hours))
+            existing_record.water_intake = to_float(data.get('water_intake', existing_record.water_intake))
+            existing_record.sleep_hours = to_float(data.get('sleep_hours', existing_record.sleep_hours))
+            existing_record.reading_hours = to_float(data.get('reading_hours', existing_record.reading_hours))
+            existing_record.meals = to_int(data.get('meals', existing_record.meals))
+            existing_record.screen_hours = to_float(data.get('screen_hours', existing_record.screen_hours))
+            existing_record.productivity = to_int(data.get('productivity', existing_record.productivity))
+            existing_record.mood = data.get('mood', existing_record.mood)
+            message = 'Data updated successfully.'
+        else:
+            # Create new record
+            record = UserInput(
+                user_id=user_id,
+                date=today,
+                exercise=data.get('exercise', 'no'),
+                exercise_hours=to_float(data.get('exercise_hours', 0)),
+                water_intake=to_float(data.get('water_intake', 0)),
+                sleep_hours=to_float(data.get('sleep_hours', 0)),
+                reading_hours=to_float(data.get('reading_hours', 0)),
+                meals=to_int(data.get('meals', 0)),
+                screen_hours=to_float(data.get('screen_hours', 0)),
+                productivity=to_int(data.get('productivity', 0)),
+                mood=data.get('mood', '')
+            )
+            db.session.add(record)
+            message = 'Data submitted successfully.'
+
         db.session.commit()
-
-        session['last_input'] = data
-        return jsonify({'status': 'success', 'message': 'Data submitted successfully.'})
+        return jsonify({'status': 'success', 'message': message})
 
     except Exception as e:
+        db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
     
 # Output Route
