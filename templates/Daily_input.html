@@ -103,14 +103,17 @@
           <div class="mb-3 question hidden" id="q2">
             <label class="form-label">If yes, how many hours did you spend on exercising?</label>
             <input type="number" name="exerciseHour" class="form-control" min="0" step="0.1" id="exercise_hours">
+            <!-- Added a Previous button -->
+            <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <!-- Added a Next button -->
-            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden" id="q3">
             <label class="form-label">How much water did you drink? (L)</label>
             <input type="number" name="waterIntake" class="form-control" min="0" step="0.1" id="water_intake">
-            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
+            <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden relative" id="q4">
@@ -118,7 +121,8 @@
             <input type="number" name="sleepHour" class="form-control" min="0" step="0.1" id="sleep_hours">
             <!-- Dynamic prompts to fill in criteria or suggestions when the mouse hovers next to the input box. -->
             <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 7-9 hrs</span>
-            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
+            <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <!-- Growing up and living part -->
@@ -126,20 +130,23 @@
           <div class="mb-3 question hidden" id="q5">
             <label class="form-label">How much time did you spend reading? (hrs)</label>
             <input type="number" name="readingHour" class="form-control" min="0" step="0.1" id="reading_hours">
-            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
+            <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden" id="q6">
             <label class="form-label">How many times did you eat today?</label>
             <input type="number" name="mealNum" class="form-control" min="0" step="0.1" id="meals">
-            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
+            <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden relative" id="q7">
             <label class="form-label">How many hours did you spend on mobile phone/computer?</label>
             <input type="number" name="deviceHour" class="form-control" min="0" step="0.1" id="screen_hours">
             <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 4-6 hrs</span>
-            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
+            <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <!-- Feeling part -->
@@ -159,7 +166,8 @@
               <option>9</option>
               <option>10</option>
             </select>
-            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
+            <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden" id="q9">
@@ -177,7 +185,8 @@
               <label class="space-x-2"><input type="radio" name="mood" value="angry"><span
                   class="text-2xl">&#128544;</span></label>
             </div>
-            <button type="button" class="next-btn btn btn-primary mt-3">Next</button>
+            <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
         </form>
       </div>
@@ -214,21 +223,17 @@
 
   <!-- Using external js files -->
   <script src="../static/js/Click&Hide.js"></script>
-
   <script>
-    // Control exercise input display
-    // function toggleExerciseInput(show) {
-    //   document.getElementById('exercise-hours').classList.toggle('hidden', !show);
-    // }
+  document.getElementById('submitBtn').addEventListener('click', async function () {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    // Disable button during submission
+    const submitBtn = this;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
 
-    // Enable the submit button only when the checkbox is checked
-    document.getElementById('agreeCheck').addEventListener('change', function () {
-      document.getElementById('submitBtn').disabled = !this.checked;
-    });
-
-    // Submit data
-    document.getElementById('submitBtn').addEventListener('click', async function () {
-      const data = {
+    const data = {
         exercise: document.querySelector('input[name="exercise"]:checked')?.value || 'no',
         exercise_hours: document.getElementById('exercise_hours').value || 0,
         water_intake: document.getElementById('water_intake').value || 0,
@@ -238,33 +243,43 @@
         screen_hours: document.getElementById('screen_hours').value || 0,
         productivity: document.getElementById('productivity').value || 0,
         mood: document.querySelector('input[name="mood"]:checked')?.value || ''
-      };
+    };
 
-      try {
+    try {
         const response = await fetch('/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
 
-        const result = await response.json();
-        alert(result.message);
-
-        if (result.status === 'success') {
-          document.getElementById('dailyForm').reset();
-          document.getElementById('submitBtn').disabled = true;
-          document.getElementById('exercise-hours').classList.add('hidden');
-          // Automatically jump to the daily_output page after submitted
-          window.location.href = "/daily_output";
-
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
         }
-      } catch (error) {
-        alert('Submission failed: ' + error.message);
-      }
-    });
-  </script>
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.message || 'Submission failed');
+        }
+
+        alert(result.message);
+        window.location.href = "/daily_output";
+    } catch (error) {
+        console.error('Submission error:', error);
+        alert(error.message);
+    } finally {
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit data';
+    }
+});
+</script>
 
 </body>
 
