@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@tailwindcss/cli": "^4.1.4",
+    "@tailwindcss/cli": "^4.1.6",
     "chart.js": "^4.4.9",
-    "tailwindcss": "^4.1.4"
+    "tailwindcss": "^4.1.6"
   },
   "name": "cits5505_group_project",
   "description": "Agile Web Developement Group 17 Project - LifeTracker\r LifeTracker is a lightweight web application that supports users to record their daily habits and is designed for personal habit formation, aiming to help users to establish and maintain an active and healthy lifestyle through daily data recording and intelligent analysis. Users can easily record their daily activities (e.g., exercise, water intake, hours of sleep, reading time, etc.) and understand their behavioral patterns and trends through automatically generated statistical charts.\r The application is user-centered and dedicated to providing an intuitive, fun, and motivating tracking experience. Through visual feedback and selective data sharing, LifeTracker encourages self-reflection, self-discipline, and social interaction for support and motivation.\r Design intent:\r   Lower the threshold of habit formation and foster self-awareness among users.\r   Utilize data-driven charts and insights to help users discover patterns and blind spots in their lives.\r   Provide social sharing options to inspire positive influence and encouragement among users.",

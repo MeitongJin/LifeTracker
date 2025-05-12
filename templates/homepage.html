@@ -8,7 +8,7 @@
     <link href="../static/css/output.css" rel="stylesheet">
 </head>
 <body>
-    <div class="main-container flex-col">
+    <div class="flex flex-col justify-between h-screen">
         <div class="fixed top-0 w-full px-5 sm:px-7 md:px-10 py-5 flex flex-col justify-center items-center sm:flex-row sm:justify-between">
             <h1 class="highlighted-heading sm:mr-5">LifeTracker</h1>
             <div class="text-[1rem] xs:text-lg mt-3 sm:mt-0 mx-3 space-x-3 flex sm:items-center sm:justify-center xs:space-x-7">
@@ -18,21 +18,23 @@
                 <a href="{{ url_for('logout') }}" class="navbar-item">Sign Out</a>
             </div>
         </div>
-        <div class="app-intro flex flex-col justify-between m-5">
+
+        <div class="flex flex-col justify-between px-7 mt-[100px] space-y-5">
             <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Good 
                 <span id="time-greeting">Morning</span>, 
                 <span class="capitalize">{{ user_name }}</span>!
               </h1>
-            <p class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-gray-700 my-3 ">DailyLife Tracker.</p>
-            <p class="text-2xl sm:text-3xl lg:text-4xl my-2">A simple app to track your daily habits and activities.</p>
-            <p class="text-2xl sm:text-3xl lg:text-4xl mb-4">Input your data easily and view your progress on the dashboard</p>
+            <p class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-gray-700">DailyLife Tracker.</p>
+            <p class="text-2xl sm:text-3xl lg:text-4xl">A simple app to track your daily habits and activities. <br/> Input your data easily and view your progress on the dashboard.</p>
             <a href="{{ url_for('daily_input') }}" class="btn mx-4 text-center sm:mx-6">Get Started</a>
         </div>
-        <div class="motivation-quote text-center italic text-gray-500 text-xl my-12">
-            <p>"Progress is progress, no matter how small."</p>
-          </div>
-          <footer class="footer mt-10 text-center text-sm text-gray-500">
+
+        
+        
+
+        <footer class="footer text-center text-sm text-gray-500 pb-5">
+            <p class="motivation-quote text-center italic text-gray-500 text-xl">"Progress is progress, no matter how small."</p>
             &copy; 2025 LifeTracker — Designed to help you grow.
         </footer>
           

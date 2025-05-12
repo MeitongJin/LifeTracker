@@ -9,7 +9,7 @@ body {
 }
 
 .main-container{
-    @apply h-screen flex justify-center items-center;
+    @apply flex justify-center items-center min-h-screen;
 }
 
 .btn {
