@@ -115,28 +115,69 @@
         </div>
 
         <!-- Reading Progress (Circular Progress) -->
-        <div class="border border-gray-200 rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-white card-hover col-span-2">
-          <h5 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-3">
-            <span class="bg-yellow-100 p-2 rounded-full">📚</span>
-            Reading Progress
-          </h5>
-          <div class="flex items-center justify-center mt-4">
-            <svg class="w-24 h-24">
-              <circle cx="50%" cy="50%" r="36" stroke="#e5e7eb" stroke-width="8" fill="none"/>
-              <circle cx="50%" cy="50%" r="36" stroke="#facc15" stroke-width="8" fill="none"
-                      stroke-dasharray="226.2" stroke-dashoffset="{{ 226.2 - (reading_hours / 1.0 * 226.2) }}"
-                      stroke-linecap="round" transform="rotate(-90 48 48)" />
-            </svg>
-          </div>
-          <p class="mt-3 text-center text-gray-600 text-sm">
-            You’ve read <strong>{{ reading_hours or 0 }}</strong> hour{{ 's' if reading_hours != 1 else '' }} today.
-          </p>
-          <p class="text-center text-gray-700 text-sm mt-1">
-            Total till today: <strong>{{ reading_total or 0 }}</strong> hour{{ 's' if reading_total != 1 else '' }}
-          </p>
-        </div>
-      </div> 
+        <!-- Reading Progress with Visual Representation -->
+<div class="card-hover border border-gray-200 rounded-xl p-6 bg-white">
+  <div class="flex items-center justify-between mb-6">
+    <h5 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+      <span class="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+        <i class="fas fa-book-open"></i>
+      </span>
+      Today's Reading
+    </h5>
+    <span class="text-sm bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full">
+      {{ reading_hours or 0 }} hour{{ 's' if reading_hours != 1 else '' }}
+    </span>
+  </div>
 
+  <!-- Visual Book Representation -->
+<div class="flex justify-center gap-2 mb-6">
+  {% for i in range(5) %}
+    <div class="flex flex-col items-center">
+      <div class="w-10 h-14 mb-1 flex items-center justify-center 
+                  {% if reading_hours and i < [reading_hours, 5]|min %} 
+                    bg-indigo-100 text-indigo-600 
+                  {% else %} 
+                    bg-gray-100 text-gray-400 
+                  {% endif %} 
+                  rounded-lg transition-all duration-300">
+        <i class="fas fa-book text-lg"></i>
+      </div>
+      <div class="w-2 h-2 rounded-full 
+                  {% if reading_hours and i < [reading_hours, 5]|min %} 
+                    bg-indigo-500 
+                  {% else %} 
+                    bg-gray-300 
+                  {% endif %}">
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Progress Details -->
+<div class="space-y-3">
+  <div>
+    <div class="flex justify-between text-sm text-gray-600 mb-1">
+      <span>Daily Progress</span>
+      <span>{{ reading_hours or 0 }}/2 hours</span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-2">
+      <div class="bg-indigo-600 h-2 rounded-full" 
+           style="width: {{ ([reading_hours, 2]|min / 2 * 100) if reading_hours else 0 }}%"></div>
+    </div>
+  </div>
+  
+  <div class="text-center text-sm text-gray-500 pt-2">
+    {% if reading_hours and reading_hours >= 2 %}
+      <span class="text-indigo-600">🎉 Daily goal achieved!</span>
+      {% if reading_hours > 2 %}
+        <span class="text-indigo-400"> (+{{ reading_hours - 2 }} extra)</span>
+      {% endif %}
+    {% else %}
+      {{ 2 - (reading_hours or 0) }} more hour{{ 's' if (2 - (reading_hours or 0)) != 1 else '' }} to go
+    {% endif %}
+  </div>
+</div>
+</div>
       <!-- Weekly Summary -->
       <div class="border border-gray-200 rounded-xl p-5 shadow-lg hover:shadow-xl transition-all duration-300 bg-white card-hover">
         <h5 class="text-lg font-bold text-gray-700 flex items-center gap-2 mb-3">
