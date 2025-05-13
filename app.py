@@ -36,6 +36,9 @@ mail = Mail(app)
 app.config['SECRET_KEY'] = '96116a385604fce2551eabb56cf90b03'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lifetracker.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SESSION_COOKIE_SECURE'] = False  # For development (True for production)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 def validate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
