@@ -12,7 +12,7 @@
 </head>
 <body>
     <div class="main-container flex-col">
-        <div class="fixed top-0 bg-gray-200 w-full px-5 sm:px-7 md:px-10 py-5 flex flex-col justify-center items-center sm:flex-row sm:justify-between">
+        <div class="fixed top-0 bg-gray-50 w-full px-5 sm:px-7 md:px-10 py-5 flex flex-col justify-center items-center sm:flex-row sm:justify-between shadow">
             <h1 class="highlighted-heading sm:mr-5">LifeTracker</h1>
             <div class="text-[1rem] xs:text-lg mt-3 sm:mt-0 mx-3 space-x-3 flex sm:items-center sm:justify-center xs:space-x-7">
                 <a href="{{ url_for('home') }}" class="navbar-item">Home</a>
@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="flex items-center space-x-2 mt-[450px] sm:mt-0">
+        <div class="flex items-center space-x-2 mt-[100px]">
             <label for="rangeToggle">Your Summary</label>
             <select id="rangeToggle" class="border border-gray-300 outline-none p-1 rounded"
                     onchange="updateCharts(this.value)">
