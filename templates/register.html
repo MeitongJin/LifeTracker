@@ -32,7 +32,7 @@
         <div class="relative w-full">
           <input type="password" placeholder="Enter your password" name="password" class="form-input" id="register-password"/>
           <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('register-password', 'register-toggle-icon')">
-              <i class="fa-solid fa-eye" id="register-toggle-icon"></i></span>
+              <i class="fa-solid fa-eye" id="register-toggle-icon"></i>
           </button>
         </div>
         {% if errors.password %}<p class="text-red-600 text-sm mt-1"> <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.password }}</p>{% endif %}
@@ -47,7 +47,7 @@
 
       <button class="btn">Register</button>
 
-      <p class="text-sm -mt-2">Already have an account? <a href="{{ url_for('login') }}"  class="underline hover:text-gray-600 hover:cursor-pointer">Log In</span></p>
+      <p class="text-sm -mt-2">Already have an account? <a href="{{ url_for('login') }}"  class="underline hover:text-gray-600 hover:cursor-pointer">Log In</a></p>
     </form>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
