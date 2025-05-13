@@ -29,35 +29,36 @@
               <option value="30" {% if current_range == '30' %}selected{% endif %}>Last 30 Days</option>
             </select>
         </div>
-        
-        <div class="w-full h-fit mt-5 px-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div class="bg-white shadow rounded p-4"><canvas id="exercise-chart"></canvas></div>
-            <div class="bg-white shadow rounded p-4"><canvas id="water-intake-chart"></canvas></div>
-            <div class="bg-white shadow rounded p-4"><canvas id="sleep-chart"></canvas></div>
-            <div class="bg-white shadow rounded p-4"><canvas id="screen-time-chart"></canvas></div>
+
+        <div class="w-full mt-5 px-4 grid grid-cols-2 gap-6">
+            <div class="bg-white shadow rounded p-4 h-60">
+                <canvas id="exercise-chart" class="w-full h-full"></canvas>
+            </div>
+            <div class="bg-white shadow rounded p-4 h-60">
+                <canvas id="water-intake-chart" class="w-full h-full"></canvas>
+            </div>
+            <div class="bg-white shadow rounded p-4 h-60">
+                <canvas id="sleep-chart" class="w-full h-full"></canvas>
+            </div>
+            <div class="bg-white shadow rounded p-4 h-60">
+                <canvas id="screen-time-chart" class="w-full h-full"></canvas>
+            </div>
         </div>
     </div>
-
     <!-- for charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Pass Flask data to JavaScript
-        const chartData = {{ chart_data|tojson|safe }};
-        const dates = {{ dates|tojson|safe }};
-        const range = {{ current_range|tojson|safe }};
+        window.chartData = {{ chart_data|tojson|safe }};
+        window.dates = {{ dates|tojson|safe }};
+        window.range = {{ current_range|tojson|safe }};
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="{{ url_for('static', filename='js/charts/dashboardchart.js') }}"></script>
+    <script>
         
         function updateCharts(range) {
         window.location.href = "{{ url_for('dashboard') }}?range=" + range;
     }
-        
-        // Initialize all charts
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeExerciseChart(chartData.exercise, dates);
-            initializeWaterChart(chartData.water, dates);
-            initializeSleepChart(chartData.sleep, dates);
-            initializeScreenChart(chartData.screen, dates);
-        });
     </script>
-    <script type="module" src="{{ url_for('static', filename='js/charts/dashboardchart.js') }}"></script>
+    
 </body>
 </html>
