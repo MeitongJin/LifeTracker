@@ -138,17 +138,17 @@ def register():
         errors = {}  #<-- Dictionary to store field-specific errors
 
         # Get form data with default empty strings
-        first_name = request.form.get('firstname', '').strip()
-        last_name = request.form.get('lastname', '').strip()
+        firstname = request.form.get('firstname', '').strip()
+        lastname = request.form.get('lastname', '').strip()
         email = request.form.get('email', '').strip()
         phone = request.form.get('phone', '').strip()  # Added default empty string
         password = request.form.get('password', '')
         password_confirm = request.form.get('password_confirm', '')   
 
         # Validation
-        if not first_name:
+        if not firstname:
             errors['firstname'] = 'First name is required.'
-        if not last_name:
+        if not lastname:
             errors['lastname'] = 'Last name is required.'
         if not email:
             errors['email'] = 'Email is required.'
@@ -171,13 +171,13 @@ def register():
         # If any errors, re-render the form with them
         if errors:
             return render_template('register.html', errors=errors,
-                                   firstname=first_name, lastname=last_name,
+                                   firstname=firstname, lastname=lastname,
                                    email=email, phone=phone)
 
         # Create new user
         new_user = User(
-            first_name=first_name,
-            last_name=last_name,
+            first_name=firstname,
+            last_name=lastname,
             email=email,
             phone=phone
         )
@@ -188,7 +188,7 @@ def register():
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('login'))
 
-    return render_template('register.html', errors={}, first_name='', last_name='', email='', phone='')
+    return render_template('register.html', errors={}, firstname='', lastname='', email='', phone='')
 
 # Reset Password
 @app.route('/resetPassword', methods=['GET', 'POST'])
@@ -310,7 +310,7 @@ def reset_password():
 def daily_input():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('Daily_input.html')
+    return render_template('Daily_input.html',user_name=session.get('user_name'))
 
 # User Input Submission - Updated to overwrite existing entries
 @app.route('/submit', methods=['POST'])
