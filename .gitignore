@@ -189,3 +189,27 @@ node_modules/
 
 #dummy data
 data/
+
+#virtual environment
+application-env/
+
+#node modules
+# macOS system files
+.DS_Store
+
+# SQLite database file
+instance/lifetracker.db
+
+# Node.js module
+node_modules/
+
+#dummy data
+data/
+# macOS system files
+.DS_Store
+
+# SQLite database file
+instance/lifetracker.db
+
+# Node.js module
+node_modules/

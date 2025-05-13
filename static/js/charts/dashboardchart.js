@@ -4,11 +4,11 @@ import { initializeSleepChart } from './sleep.js';
 import { initializeScreenChart } from './screen-time.js';
 
 document.addEventListener('DOMContentLoaded', function () {
-    const data = window.chartData;
-    const dates = data.dates;
+    const chartData = window.chartData;
+    const dates = window.dates;  
 
-    initializeExerciseChart(data.exercise, dates);
-    initializeWaterChart(data.water, dates);
-    initializeSleepChart(data.sleep, dates);
-    initializeScreenChart(data.screen, dates);
+    initializeExerciseChart(chartData.exercise, dates);
+    initializeWaterChart(chartData.water, dates);
+    initializeSleepChart(chartData.sleep, dates);
+    initializeScreenChart(chartData.screen, dates);
 });

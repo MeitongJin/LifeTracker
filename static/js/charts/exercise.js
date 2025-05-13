@@ -10,6 +10,15 @@ export function initializeExerciseChart(data, labels) {
               backgroundColor: '#4B9CD3'
           }]
       },
-      options: { responsive: true }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Exercise'
+            }
+        }
+    } 
   });
 }
