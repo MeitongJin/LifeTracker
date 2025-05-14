@@ -40,7 +40,7 @@
         <div class="relative w-full">
           <input type="password" placeholder="Re-enter your password" name="password_confirm" class="form-input" id="register-repeat-password"/>
           <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('register-repeat-password', 'register-repeat-toggle-icon')">
-              <i class="fa-solid fa-eye" id="register-repeat-toggle-icon"></i></span>
+              <i class="fa-solid fa-eye" id="register-repeat-toggle-icon"></i>
           </button>
       </div>
       {% if errors.password_confirm %}<p class="text-red-600 text-sm mt-1"> <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.password_confirm }}</p>{% endif %}
