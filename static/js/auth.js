@@ -1,11 +1,11 @@
 // toggle password show/hide
 
 function togglePasswordButton(inputId, toggleIconId){
-    passwordInput = document.getElementById(inputId);
+    const passwordInput = document.getElementById(inputId);
     const toggleIcon = document.getElementById(toggleIconId);
 
-    isPassword = passwordInput.type === "password";
-    passwordInput.type = isPassword ? "password" : "text";
+    const isPassword = passwordInput.type === "password";
+    // passwordInput.type = isPassword ? "password" : "text";
 
     if(isPassword){
         toggleIcon.classList.remove("fa-eye");
