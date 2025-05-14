@@ -152,16 +152,9 @@
     </footer>
 
     <script>
-        // Time-based greeting
-        document.addEventListener('DOMContentLoaded', function() {
-            const hour = new Date().getHours();
-            const greeting = document.querySelector('.hero-title');
-            if (greeting) {
-                if (hour < 12) greeting.textContent = 'Good Morning, Aksa!';
-                else if (hour < 18) greeting.textContent = 'Good Afternoon, Aksa!';
-                else greeting.textContent = 'Good Evening, Aksa!';
-            }
-        });
+       const hour = new Date().getHours();
+  document.getElementById('time-greeting').textContent = 
+    hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening';
     </script>
 </body>
 </html>

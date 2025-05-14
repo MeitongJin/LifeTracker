@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share View</title>
+
+    <link href="../static/css/output.css" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container flex-col pb-5">
+        <div class="fixed top-0 bg-gray-50 w-full px-5 sm:px-7 md:px-10 py-5 flex flex-col justify-center items-center sm:flex-row sm:justify-between shadow">  
+            <h1 class="highlighted-heading sm:mr-5">LifeTracker</h1>
+            <div class="text-[1rem] xs:text-lg mt-3 sm:mt-0 mx-3 space-x-3 flex sm:items-center sm:justify-center xs:space-x-7">
+                <a href="{{ url_for('home') }}" class="navbar-item">Home</a>
+                <a href="{{ url_for('dashboard') }}" class="navbar-item">Dashboard</a>
+                <a href="{{ url_for('daily_output') }}" class="navbar-item">Track Progress</a>
+                <a href="{{ url_for('logout') }}" class="navbar-item">Sign Out</a>
+            </div>
+        </div>
+
+        <div class="sharing-users self-start justify-items-start mx-10 mt-[100px]">
+            <p class="text-xl sm:text-2xl">Users who have shared their data with you.</p>
+
+            <div id="users-card" class="flex flex-wrap space-y-7 space-x-7 mt-3">
+                <!-- load users here -->
+                <!-- currently done using js -->
+
+                <!-- backend is added to the following code which is now commented out -->
+                <!-- 
+                    <div class="bg-gray-200 w-fit h-fit px-5 py-3 rounded shadow flex items-center space-x-3 hover:cursor-pointer hover:bg-gray-300 transition-all duration-200">
+                        <div class = "bg-gray-100 rounded-full h-[2.5rem] w-[2.5rem] p-3 flex items-center justify-center"><span class="text-xl">users initial</span></div>
+                        <div>
+                            <p class = "font-semibold">${user.name}</p>
+                            <p class = "text-gray-700">${user.email}</p>
+                        </div>
+                    </div> 
+                -->
+            </div>
+        </div>
+
+        <div>
+            <div class="w-full h-fit mt-5 px-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="bg-white shadow rounded p-4"><canvas id="exercise-chart"></canvas></div>
+                <div class="bg-white shadow rounded p-4"><canvas id="water-intake-chart"></canvas></div>
+                <div class="bg-white shadow rounded p-4"><canvas id="sleep-chart"></canvas></div>
+                <div class="bg-white shadow rounded p-4"><canvas id="screen-time-chart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../static/js/load-users.js"></script>
+</body>
+</html>
