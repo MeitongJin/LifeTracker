@@ -20,7 +20,6 @@ from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
 from datetime import datetime, timedelta, date
 from sqlalchemy.exc import IntegrityError
 
-
 app = Flask(__name__)
 
 # Email configuration
@@ -499,6 +498,31 @@ def dashboard():
                            chart_data=chart_data, 
                            current_range=range,
                            dates=dates)
+
+@app.route('/share_view')
+def share_view():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    # Get users who have shared with current user
+    shared_users = User.query.join(
+        Sharing, Sharing.sharing_user_id == User.id
+    ).filter(
+        Sharing.shared_with_id == session['user_id']
+    ).all()
+    
+    # Get default data for initial chart display
+    chart_data = {
+        'exercise': [],
+        'water': [],
+        'sleep': [],
+        'screen': [],
+        'dates': []
+    }
+    
+    return render_template('share_view.html',
+                         shared_users=shared_users,
+                         chart_data=chart_data)
 
 # ResetPassword Clear Session
 @app.route('/clear_reset_session', methods=['POST'])
