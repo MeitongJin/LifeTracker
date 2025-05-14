@@ -9,8 +9,25 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      /* Use a gradient for the background color. */
-      background: linear-gradient(to right, #d7dde8, #757f9a);
+      /* Ensure consistent modern font styles across different operating systems. */
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      /* 1.6 is a relative value, meaning that the height of each line is 1.6 times the size of the font. */
+      line-height: 1.6;
+    }
+
+    .nav-link {
+      /* All attributes change within 0.2 seconds. The effect of ease. */
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      /* Color changes when mouse is hovering */
+      color: #111827;
+      /* Element moves vertically up by 1 pixel */
+      transform: translateY(-1px);
     }
 
     .hidden {
@@ -83,18 +100,20 @@
       <h1 class="text-2xl font-bold text-gray-900">
         Hi, <span class="text-gray-700"> {{ user_name }} </span>!
       </h1>
-      <a href="{{ url_for('logout') }}"
-        class="text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1">
-        <i class="fas fa-sign-out-alt"></i> Sign Out
-      </a>
     </div>
 
     <!-- Navigation Bar -->
     <nav class="mb-8 flex gap-6 text-sm font-medium text-gray-600 border-b border-gray-200 pb-2">
-      <a href="{{ url_for('home') }}" class="nav-link">Home</a>
-      <a href="{{ url_for('dashboard') }}" class="nav-link text-gray-900">Dashboard</a>
+      <div class="flex space-x-7">
+        <a href="{{ url_for('home') }}" class="nav-link text-gray-900">Home</a>
+        <a href="{{ url_for('dashboard') }}" class="nav-link text-gray-900">Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="nav-link text-gray-900">Sign Out</a>
+      </div>
     </nav>
 
+    <!-- A 2 pixel thick, red, horizontal line. Used to separate page content. -->
+    <hr class="border-t-2 border-red-500">
+    <br>
     <h1 class="mb-4 text-4xl font-semibold">LifeTracker --- Daily Entry</h1>
 
     <div class="bg-white rounded-xl p-8 shadow-md mb-10">
@@ -210,7 +229,7 @@
 
       <!-- Submission area -->
       <div class="submit max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
-        <h2 class="text-2xl font-bold mb-4 text-center">📌 Pre-Submission Disclaimer & Notes</h2>
+        <h2 class="text-2xl font-bold mb-4 text-center">Pre-Submission Disclaimer & Notes</h2>
 
         <div class="text-gray-800 text-sm space-y-3 h-60 overflow-y-auto border p-4 rounded">
           <p><strong>[Description of the use] </strong> The data you submit will be used to analyze and record your
@@ -241,16 +260,16 @@
   <!-- Using external js files -->
   <script src="../static/js/Click&Hide.js"></script>
   <script>
-  document.getElementById('submitBtn').addEventListener('click', async function () {
-    if (isSubmitting) return;
-    isSubmitting = true;
-    
-    // Disable button during submission
-    const submitBtn = this;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting...';
+    document.getElementById('submitBtn').addEventListener('click', async function () {
+      if (isSubmitting) return;
+      isSubmitting = true;
 
-    const data = {
+      // Disable button during submission
+      const submitBtn = this;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      const data = {
         exercise: document.querySelector('input[name="exercise"]:checked')?.value || 'no',
         exercise_hours: document.getElementById('exercise_hours').value || 0,
         water_intake: document.getElementById('water_intake').value || 0,
@@ -260,43 +279,43 @@
         screen_hours: document.getElementById('screen_hours').value || 0,
         productivity: document.getElementById('productivity').value || 0,
         mood: document.querySelector('input[name="mood"]:checked')?.value || ''
-    };
+      };
 
-    try {
+      try {
         const response = await fetch('/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(data)
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
         });
 
         // Check if response is JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-            const text = await response.text();
-            throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
+          const text = await response.text();
+          throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
         }
 
         const result = await response.json();
-        
+
         if (!response.ok) {
-            throw new Error(result.message || 'Submission failed');
+          throw new Error(result.message || 'Submission failed');
         }
 
         alert(result.message);
         window.location.href = "/daily_output";
-    } catch (error) {
+      } catch (error) {
         console.error('Submission error:', error);
         alert(error.message);
-    } finally {
+      } finally {
         isSubmitting = false;
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit data';
-    }
-});
-</script>
+      }
+    });
+  </script>
 
 </body>
 
