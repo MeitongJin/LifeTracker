@@ -400,7 +400,7 @@ def daily_output():
         ).order_by(UserInput.date).all()
 
     if not records:
-        return render_template("Daily_output.html", message="No data found.", selected_date=selected_date or "")
+        return render_template("Daily_output.html", message="No data found.", selected_date=selected_date or "", user_name=session.get('user_name'))
 
     # Prepare data for the charts
     df = pd.DataFrame([{
@@ -590,6 +590,7 @@ def share_dashboard():
         flash("An error occurred while sharing. Please try again.", "danger")
 
     return redirect(url_for('dashboard'))
+
 
 # ResetPassword Clear Session
 @app.route('/clear_reset_session', methods=['POST'])
