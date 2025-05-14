@@ -35,14 +35,6 @@
 
         <!-- body -->
         <div class="grid gap-5 lg:flex lg:space-x-7 px-3 py-5 xs:px-5 sm:px-10">
-            {% if message %}
-                <div class="w-full text-center bg-yellow-100 text-yellow-800 p-5 rounded shadow">
-                    <p class="text-lg font-medium">{{ message }}</p>
-                    {% if show_link %}
-                        <a href="{{ url_for('daily_input') }}" class="text-blue-600 underline mt-2 inline-block">去填写每日输入</a>
-                    {% endif %}
-                </div>
-            {% else %}
             <div class="grid grid-cols-1 gap-6 lg:w-[120rem]">
                 <div class="bg-white shadow rounded p-4 h-60">
                     <canvas id="exercise-chart" class="w-full h-full"></canvas>
@@ -93,22 +85,17 @@
                     
                 </div>
             </div>
-        {% endif %}
-    </div>
+        </div>
 
         
     </div>
     <!-- for charts -->
     <script>
-        {% if not message %}
         window.chartData = {{ chart_data|tojson|safe }};
         window.dates = {{ dates|tojson|safe }};
         window.range = {{ current_range|tojson|safe }};
-        {% endif %}
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    {% if not message %}
     <script type="module" src="{{ url_for('static', filename='js/charts/dashboardchart.js') }}"></script>
     <script>
         
@@ -124,8 +111,7 @@
             initializeScreenChart(chartData.screen, dates);
         });
     </script>
-    {% endif %}
-    
+
 </body>
 </html>
 

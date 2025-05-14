@@ -401,7 +401,7 @@ def daily_output():
         ).order_by(UserInput.date).all()
 
     if not records:
-        return render_template("Daily_output.html", message="No data found.", selected_date=selected_date or "")
+        return render_template("Daily_output.html", message="No data found.", selected_date=selected_date or "", user_name=session.get('user_name'))
 
     # Prepare data for the charts
     df = pd.DataFrame([{
@@ -479,20 +479,7 @@ def dashboard():
 
     # Get the user inputs for the selected range (7 or 30 days)
     range = request.args.get('range', '7')
-    try:
-        days = int(range)
-    except ValueError:
-        days = 7
-
-    user_inputs = get_user_inputs(session['user_id'], days=days)
-
-    # If there is no data, a friendly prompt will be displayed
-    if not user_inputs:
-        return render_template('dashboard.html',
-                               message="No data - please submit your daily input first.",
-                               show_link=True,
-                               current_range=range,
-                               user_name=session.get('user_name'))
+    user_inputs = get_user_inputs(session['user_id'], days=int(range))
 
     # Prepare the data for the charts
     exercise_data = prepare_exercise_data(user_inputs)
@@ -511,8 +498,8 @@ def dashboard():
     return render_template('dashboard.html', 
                            chart_data=chart_data, 
                            current_range=range,
-                           dates=dates
-                           user_name=session.get('user_name'))
+                           dates=dates)
+
 
 # ResetPassword Clear Session
 @app.route('/clear_reset_session', methods=['POST'])
