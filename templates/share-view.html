@@ -20,13 +20,11 @@
 
         <div class="sharing-users self-start justify-items-start mx-10 mt-[100px]">
             <p class="text-xl sm:text-2xl">Users who have shared their data with you.</p>
-
-            <div id="users-card" class="flex flex-wrap space-y-7 space-x-7 mt-3">
+        
+            <div id="users-card" class="flex flex-wrap gap-4 mt-3">
                 {% for user in shared_users %}
                 <a href="{{ url_for('share_view', user_id=user.id, range=range_days) }}"
-                   class="bg-gray-200 w-fit h-fit px-5 py-3 rounded shadow flex items-center space-x-3 hover:bg-gray-300 transition-all duration-200">
-                <div class="bg-gray-200 w-fit h-fit px-5 py-3 rounded shadow flex items-center space-x-3 hover:cursor-pointer hover:bg-gray-300 transition-all duration-200"
-                     onclick="loadUserData({{ user.id }})">
+                   class="bg-gray-200 w-full sm:w-fit h-fit px-5 py-3 rounded shadow flex items-center space-x-3 hover:bg-gray-300 transition-all duration-200">
                     <div class="bg-gray-100 rounded-full h-[2.5rem] w-[2.5rem] p-3 flex items-center justify-center">
                         <span class="text-xl">{{ user.first_name[0] }}{{ user.last_name[0] if user.last_name }}</span>
                     </div>
@@ -34,8 +32,7 @@
                         <p class="font-semibold">{{ user.first_name }} {{ user.last_name }}</p>
                         <p class="text-gray-700">{{ user.email }}</p>
                     </div>
-                </a>       
-                </div>
+                </a>
                 {% else %}
                 <p class="text-gray-500">No users have shared data with you yet.</p>
                 {% endfor %}
@@ -76,87 +73,11 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        let currentUserId = null;
-        let currentRange = '7';
-        let charts = {
-            exercise: null,
-            water: null,
-            sleep: null,
-            screen: null
-        };
+    <script src="{{ url_for('static', filename='js/charts/share-view.js') }}"></script>
+    <script >
+             window.chartData = {{ chart_data|tojson|safe }};
+             window.dates = {{ chart_data.dates|tojson|safe }};
 
-        // Initialize empty charts
-        function initializeCharts() {
-            const ctxOptions = {
-                type: 'line',
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            };
-
-            charts.exercise = new Chart(
-                document.getElementById('exercise-chart'),
-                { ...ctxOptions, data: { labels: [], datasets: [{ label: 'Exercise Hours', data: [] }] } }
-            );
-            charts.water = new Chart(
-                document.getElementById('water-intake-chart'),
-                { ...ctxOptions, data: { labels: [], datasets: [{ label: 'Water Intake (L)', data: [] }] } }
-            );
-            charts.sleep = new Chart(
-                document.getElementById('sleep-chart'),
-                { ...ctxOptions, data: { labels: [], datasets: [{ label: 'Sleep Hours', data: [] }] } }
-            );
-            charts.screen = new Chart(
-                document.getElementById('screen-time-chart'),
-                { ...ctxOptions, data: { labels: [], datasets: [{ label: 'Screen Time (hrs)', data: [] }] } }
-            );
-        }
-
-        // Load data for a specific user
-        function loadUserData(userId) {
-            currentUserId = userId;
-            document.getElementById('viewing-user').textContent = `Viewing ${event.currentTarget.querySelector('.font-semibold').textContent}'s data`;
-            fetchData();
-        }
-
-        // Update chart range
-        function updateChartRange(range) {
-            currentRange = range;
-            if (currentUserId) {
-                fetchData();
-            }
-        }
-
-        // Fetch data from server
-        function fetchData() {
-            fetch(`/get_shared_data/${currentUserId}?range=${currentRange}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                        return;
-                    }
-                    
-                    // Update all charts
-                    updateChart(charts.exercise, data.dates, data.exercise, 'Exercise Hours');
-                    updateChart(charts.water, data.dates, data.water, 'Water Intake (L)');
-                    updateChart(charts.sleep, data.dates, data.sleep, 'Sleep Hours');
-                    updateChart(charts.screen, data.dates, data.screen, 'Screen Time (hrs)');
-                });
-        }
-
-        // Helper function to update a chart
-        function updateChart(chart, labels, data, label) {
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = data;
-            chart.data.datasets[0].label = label;
-            chart.update();
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initializeCharts);
     </script>
 </body>
 </html>

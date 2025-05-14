@@ -480,6 +480,10 @@ def dashboard():
     range = request.args.get('range', '7')
     user_inputs = get_user_inputs(session['user_id'], days=int(range))
 
+    # Get list of people the current user has shared with
+    shared_with = SharedAccess.query.filter_by(owner_id=session['user_id'])\
+        .join(User, SharedAccess.viewer_id == User.id).all()
+
     # Prepare the data for the charts
     exercise_data = prepare_exercise_data(user_inputs)
     water_data = prepare_water_data(user_inputs)
@@ -494,10 +498,12 @@ def dashboard():
         'screen': screen_data
     }
 
+    
     return render_template('dashboard.html', 
-                           chart_data=chart_data, 
-                           current_range=range,
-                           dates=dates)
+                         chart_data=chart_data, 
+                         current_range=range,
+                         dates=dates,
+                         shared_with=shared_with)
 
 @app.route('/share_view', methods=['GET'])
 def share_view():
