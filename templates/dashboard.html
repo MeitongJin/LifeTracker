@@ -33,7 +33,7 @@
             </select>
         </div>
 
-        <!-- dody -->
+        <!-- body -->
         <div class="grid gap-5 lg:flex lg:space-x-7 px-3 py-5 xs:px-5 sm:px-10">
             <div class="grid grid-cols-1 gap-6 lg:w-[120rem]">
                 <div class="bg-white shadow rounded p-4 h-60">
@@ -85,7 +85,6 @@
                     
                 </div>
             </div>
-
         </div>
 
         
@@ -101,7 +100,7 @@
     <script>
         
         function updateCharts(range) {
-        window.location.href = "{{ url_for('dashboard') }}?range=" + range;
+            window.location.href = "{{ url_for('dashboard') }}?range=" + range;
         }
         
         // Initialize all charts
@@ -112,7 +111,7 @@
             initializeScreenChart(chartData.screen, dates);
         });
     </script>
-    
+
 </body>
 </html>
 

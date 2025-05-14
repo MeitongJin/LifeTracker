@@ -401,7 +401,7 @@ def daily_output():
         ).order_by(UserInput.date).all()
 
     if not records:
-        return render_template("Daily_output.html", message="No data found.", selected_date=selected_date or "")
+        return render_template("Daily_output.html", message="No data found.", selected_date=selected_date or "", user_name=session.get('user_name'))
 
     # Prepare data for the charts
     df = pd.DataFrame([{
@@ -499,6 +499,7 @@ def dashboard():
                            chart_data=chart_data, 
                            current_range=range,
                            dates=dates)
+
 
 # ResetPassword Clear Session
 @app.route('/clear_reset_session', methods=['POST'])
