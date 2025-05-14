@@ -35,3 +35,9 @@ class UserInput(db.Model):
     screen_hours = db.Column(db.Float, default=0)
     productivity = db.Column(db.Integer)             # 1 to 10
     mood = db.Column(db.String(20))                  # e.g., "happy"
+
+# models.py
+class SharedAccess(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # The sharer
+    viewer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # The recipient

@@ -22,7 +22,7 @@
                 <a href="{{ url_for('logout') }}" class="navbar-item">Sign Out</a>
             </div>
         </div>
-
+        
         <div class="flex items-center space-x-2 mt-[100px]">
             <label for="rangeToggle">Your Summary</label>
             <select id="rangeToggle" class="border border-gray-300 outline-none p-1 rounded"
@@ -46,7 +46,8 @@
                 <canvas id="screen-time-chart" class="w-full h-full"></canvas>
             </div>
         </div>
-    </div>
+
+</div>
     <!-- for charts -->
     <script>
         window.chartData = {{ chart_data|tojson|safe }};
@@ -67,6 +68,13 @@
             initializeWaterChart(chartData.water, dates);
             initializeSleepChart(chartData.sleep, dates);
             initializeScreenChart(chartData.screen, dates);
+        });
+
+        document.querySelector('input[name="viewer_email"]').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.form.submit();
+            }
         });
     </script>
     
