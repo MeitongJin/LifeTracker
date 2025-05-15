@@ -6,12 +6,12 @@ LifeTracker is a lightweight web application that supports users to record their
 
 The application is user-centered and dedicated to providing an intuitive, fun, and motivating tracking experience. Through visual feedback and selective data sharing, LifeTracker encourages self-reflection, self-discipline, and social interaction for support and motivation.
 
-### Design Intent：
+## Design Intent：
 - Lower the threshold of habit formation and foster self-awareness among users.
 - Utilize data-driven charts and insights to help users discover patterns and blind spots in their lives.
 - Provide social sharing options to inspire positive influence and encouragement among users.
 
-## Team Members
+## Group Members
 
 | UWA ID   | Name           | Github user name     |
 |:-------  |:---------------|----------------------|
