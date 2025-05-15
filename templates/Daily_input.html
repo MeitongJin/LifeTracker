@@ -303,6 +303,7 @@
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
+            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value,
           },
           body: JSON.stringify(data)
         });
