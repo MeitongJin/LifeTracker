@@ -118,7 +118,8 @@
 
     <div class="bg-white rounded-xl p-8 shadow-md mb-10">
       <div class="form-section">
-        <form id="dailyForm">
+        <form id="dailyForm" method="POST" action="{{ url_for('submit') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <!-- Physical health component -->
           <h2 class="text-xl font-semibold mb-4">🔹 Physical Metrics</h2>
           <div class="mb-3 question" id="q1">
@@ -138,7 +139,8 @@
 
           <div class="mb-3 question hidden" id="q2">
             <label class="form-label">If yes, how many hours did you spend on exercising?</label>
-            <input type="number" name="exerciseHour" class="form-control" min="0" step="0.1" id="exercise_hours">
+            <input type="number" name="exerciseHour" class="form-control" min="0" max="24" step="0.1"
+              id="exercise_hours">
             <!-- Added a Previous button -->
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <!-- Added a Next button -->
@@ -147,14 +149,14 @@
 
           <div class="mb-3 question hidden" id="q3">
             <label class="form-label">How much water did you drink? (L)</label>
-            <input type="number" name="waterIntake" class="form-control" min="0" step="0.1" id="water_intake">
+            <input type="number" name="waterIntake" class="form-control" min="0" max="20" step="0.1" id="water_intake">
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden relative" id="q4">
             <label class="form-label">How many hours did you sleep?</label>
-            <input type="number" name="sleepHour" class="form-control" min="0" step="0.1" id="sleep_hours">
+            <input type="number" name="sleepHour" class="form-control" min="0" max="24" step="0.1" id="sleep_hours">
             <!-- Dynamic prompts to fill in criteria or suggestions when the mouse hovers next to the input box. -->
             <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 7-9 hrs</span>
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
@@ -165,21 +167,21 @@
           <h2 class="text-xl font-semibold mb-4">🔹 Growth & Habits</h2>
           <div class="mb-3 question hidden" id="q5">
             <label class="form-label">How much time did you spend reading? (hrs)</label>
-            <input type="number" name="readingHour" class="form-control" min="0" step="0.1" id="reading_hours">
+            <input type="number" name="readingHour" class="form-control" min="0" max="24" step="0.1" id="reading_hours">
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden" id="q6">
             <label class="form-label">How many times did you eat today?</label>
-            <input type="number" name="mealNum" class="form-control" min="0" step="0.1" id="meals">
+            <input type="number" name="mealNum" class="form-control" min="0" max="10" step="1" id="meals">
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden relative" id="q7">
             <label class="form-label">How many hours did you spend on mobile phone/computer?</label>
-            <input type="number" name="deviceHour" class="form-control" min="0" step="0.1" id="screen_hours">
+            <input type="number" name="deviceHour" class="form-control" min="0" max="24" step="0.1" id="screen_hours">
             <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 4-6 hrs</span>
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
@@ -268,10 +270,14 @@
   </div>
 
   <!-- Using external js files -->
-  <script src="../static/js/Click&Hide.js"></script>
+  <script src="{{ url_for('static', filename='js/Click&Hide.js') }}"></script>
   <script>
+    // Variables must be declared before they can be used
+    let isSubmitting = false;
+
     document.getElementById('submitBtn').addEventListener('click', async function () {
       if (isSubmitting) return;
+
       isSubmitting = true;
 
       // Disable button during submission
