@@ -1,5 +1,5 @@
 from extensions import db
-from datetime import date
+from datetime import date, datetime
 
 
 # User model
@@ -35,3 +35,14 @@ class UserInput(db.Model):
     screen_hours = db.Column(db.Float, default=0)
     productivity = db.Column(db.Integer)             # 1 to 10
     mood = db.Column(db.String(20))                  # e.g., "happy"
+
+class SharedAccess(db.Model):
+    __tablename__ = 'shared_access'
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    viewer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True) 
+    
+    # Relationships
+    owner = db.relationship('User', foreign_keys=[owner_id], backref='shared_by_me')
+    viewer = db.relationship('User', foreign_keys=[viewer_id], backref='shared_with_me')

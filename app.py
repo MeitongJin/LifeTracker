@@ -14,12 +14,11 @@ import io
 import base64
 # Custom modules
 from extensions import db, csrf
-from models import User, UserInput
+from models import User, UserInput, SharedAccess
 from input import to_float, to_int
 from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
 from datetime import datetime, timedelta, date
 from sqlalchemy.exc import IntegrityError
-
 
 app = Flask(__name__)
 
@@ -481,6 +480,10 @@ def dashboard():
     range = request.args.get('range', '7')
     user_inputs = get_user_inputs(session['user_id'], days=int(range))
 
+    # Get list of people the current user has shared with
+    shared_with = SharedAccess.query.filter_by(owner_id=session['user_id'])\
+        .join(User, SharedAccess.viewer_id == User.id).all()
+
     # Prepare the data for the charts
     exercise_data = prepare_exercise_data(user_inputs)
     water_data = prepare_water_data(user_inputs)
@@ -495,10 +498,98 @@ def dashboard():
         'screen': screen_data
     }
 
+    
     return render_template('dashboard.html', 
-                           chart_data=chart_data, 
-                           current_range=range,
-                           dates=dates)
+                         chart_data=chart_data, 
+                         current_range=range,
+                         dates=dates,
+                         shared_with=shared_with)
+
+@app.route('/share_view', methods=['GET'])
+def share_view():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    viewer_id = session['user_id']
+
+    # Get list of users who have shared with this viewer
+    shared_users = db.session.query(User).join(SharedAccess, SharedAccess.owner_id == User.id)\
+        .filter(SharedAccess.viewer_id == viewer_id).all()
+
+    # Get selected user and range
+    selected_user_id = request.args.get('user_id', type=int)
+    range_days = request.args.get('range', 7, type=int)
+
+    chart_data = {
+        'exercise': [],
+        'water': [],
+        'sleep': [],
+        'screen': [],
+        'dates': []
+    }
+    viewing_user = None
+
+    if selected_user_id:
+        access = SharedAccess.query.filter_by(owner_id=selected_user_id, viewer_id=viewer_id).first()
+        if access:
+            inputs = get_user_inputs(selected_user_id, days=range_days)
+            chart_data = {
+                'exercise': prepare_exercise_data(inputs)['hours'],
+                'water': prepare_water_data(inputs),
+                'sleep': prepare_sleep_data(inputs),
+                'screen': prepare_screen_data(inputs),
+                'dates': [r.date.strftime('%Y-%m-%d') for r in inputs]
+            }
+            viewing_user = User.query.get(selected_user_id)
+
+    return render_template('share-view.html',
+                           shared_users=shared_users,
+                           chart_data=chart_data,
+                           selected_user_id=selected_user_id,
+                           viewing_user=viewing_user,
+                           range_days=range_days)
+
+
+
+@app.route('/share_dashboard', methods=['POST'])
+def share_dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    if not request.form:  # Check if form data exists
+        flash("No form data submitted", "danger")
+        return redirect(url_for('dashboard'))
+
+    viewer_email = request.form.get('viewer_email', '').strip().lower()
+    if not viewer_email:  # Validate email is provided
+        flash("Please enter an email address", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        viewer = User.query.filter_by(email=viewer_email).first()
+        owner_id = session['user_id']
+
+        if not viewer:
+            flash("User not found.", "danger")
+        elif viewer.id == owner_id:
+            flash("You can't share with yourself.", "warning")
+        else:
+            # Check if already shared
+            existing = SharedAccess.query.filter_by(owner_id=owner_id, viewer_id=viewer.id).first()
+            if existing:
+                flash("Already shared with this user.", "info")
+            else:
+                new_access = SharedAccess(owner_id=owner_id, viewer_id=viewer.id)
+                db.session.add(new_access)
+                db.session.commit()
+                flash("Dashboard shared successfully!", "success")
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error sharing dashboard: {str(e)}")
+        flash("An error occurred while sharing. Please try again.", "danger")
+
+    return redirect(url_for('dashboard'))
 
 
 # ResetPassword Clear Session
