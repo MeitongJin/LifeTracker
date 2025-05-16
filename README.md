@@ -35,6 +35,7 @@ Before running the application, make sure you have the following installed:
 - Python 3.8 or higher
 - pip (Python package installer)
 - Git
+- Node
 
 ## Installation and Setup
 
@@ -65,6 +66,11 @@ source venv/bin/activate
 4. Install the required dependencies:
 ```bash
 pip install -r requirements.txt
+```
+
+5. Install client-side dependencies from the package.json file:
+```bash
+npm install
 ```
 
 ## Database Setup
