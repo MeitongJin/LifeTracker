@@ -195,7 +195,7 @@ These tests validate core application logic, including:
 ```bash
 python test_app_unit.py
 ```
-These tests use an in-memory SQLite database and do not affect production data.
+These tests use an **in-memory SQLite database** and do not affect production data.
 
 ### Selenium Testing: `test_app_selenium.py`
 These tests simulate real user actions in a headless browser, including:
@@ -203,22 +203,19 @@ These tests simulate real user actions in a headless browser, including:
 - Logging in and logging out
 - Verifying page contents after login (e.g., dashboard/home)
 - Filling out forms (select cases)
-#### ▶️ Before running Selenium tests:
-Make sure the test server is running in a separate terminal:
-```bash
-python test_server.py
-```
-Then, in a new terminal:
+#### ▶️ To run Selenium test (Headless):
+The test script automatically starts the Flask app in a background thread.
+Just run:
 ```bash
 python test_app_selenium.py
 ```
-The test server uses an in-memory test database and automatically injects a test user.
+All tests will execute in sequence using an **in-memory database**, and the browser will run in headless mode.
 
 **NOTE**: Chrome and Chromedriver must be installed and available in your system PATH. See "Running Selenium" section below if needed.
 
 #### ▶️ Running Selenium (Headless)
 To run Selenium tests without opening a browser window, tests use Chrome in headless mode.
-If you encounter issues like NoSuchDriverException or chromedriver not found, ensure you have:
+If you encounter issues like `NoSuchDriverException` or `chromedriver not found`, ensure you have:
 - Installed Google Chrome
 - Installed the correct version of [Chromedriver](https://sites.google.com/chromium.org/driver/)
 - Placed chromedriver in your system path
