@@ -117,146 +117,198 @@
     <h1 class="mb-4 text-4xl font-semibold">LifeTracker --- Daily Entry</h1>
 
     <div class="bg-white rounded-xl p-8 shadow-md mb-10">
-      <div class="form-section">
-        <form id="dailyForm" method="POST" action="{{ url_for('submit') }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <form method="POST" action="{{ url_for('daily_input') }}" onsubmit="return validateInputs()">
+        {{ form.csrf_token }}
+
+        <div class="form-section">
           <!-- Physical health component -->
-          <h2 class="text-xl font-semibold mb-4">🔹 Physical Metrics</h2>
+          <h2 class="text-xl font-semibold mb-4">Physical Metrics</h2>
           <div class="mb-3 question" id="q1">
-            <label class="form-label">Did you exercise?</label>
+            {{ form.exercise.label(class="form-label") }}
             <br>
+            {% for subfield in form.exercise %}
             <div class="form-check-inline">
-              <input class="form-check-input" type="radio" name="exercise" value="yes"
-                onclick="toggleExerciseInput(true)">
-              <label class="form-check-label">Yes</label>
+              {{ subfield(class="form-check-input") }}
+              {{ subfield.label(class="form-check-label") }}
             </div>
-            <div class="form-check-inline">
-              <input class="form-check-input" type="radio" name="exercise" value="no"
-                onclick="toggleExerciseInput(false)">
-              <label class="form-check-label">No</label>
+            {% endfor %}
+            {% if form.exercise.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.exercise.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
             </div>
+            {% endif %}
+            <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden" id="q2">
-            <label class="form-label">If yes, how many hours did you spend on exercising?</label>
-            <input type="number" name="exerciseHour" class="form-control" min="0" max="24" step="0.1"
-              id="exercise_hours">
-            <!-- Added a Previous button -->
+            {{ form.exercise_hours.label(class="form-label") }}
+            {{ form.exercise_hours(class="form-control", id="exercise_hours") }}
+            {% if form.exercise_hours.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.exercise_hours.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
-            <!-- Added a Next button -->
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden" id="q3">
-            <label class="form-label">How much water did you drink? (L)</label>
-            <input type="number" name="waterIntake" class="form-control" min="0" max="20" step="0.1" id="water_intake">
+            {{ form.water_intake.label(class="form-label") }}
+            {{ form.water_intake(class="form-control", id="water_intake") }}
+            {% if form.water_intake.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.water_intake.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden relative" id="q4">
-            <label class="form-label">How many hours did you sleep?</label>
-            <input type="number" name="sleepHour" class="form-control" min="0" max="24" step="0.1" id="sleep_hours">
-            <!-- Dynamic prompts to fill in criteria or suggestions when the mouse hovers next to the input box. -->
-            <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 7-9 hrs</span>
+            {{ form.sleep_hours.label(class="form-label") }}
+            {{ form.sleep_hours(class="form-control", id="sleep_hours") }}
+            <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 7-9
+              hrs</span>
+            {% if form.sleep_hours.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.sleep_hours.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <!-- Growing up and living part -->
-          <h2 class="text-xl font-semibold mb-4">🔹 Growth & Habits</h2>
+          <h2 class="text-xl font-semibold mb-4">Growth & Habits</h2>
           <div class="mb-3 question hidden" id="q5">
-            <label class="form-label">How much time did you spend reading? (hrs)</label>
-            <input type="number" name="readingHour" class="form-control" min="0" max="24" step="0.1" id="reading_hours">
+            {{ form.reading_hours.label(class="form-label") }}
+            {{ form.reading_hours(class="form-control", id="reading_hours") }}
+            {% if form.reading_hours.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.reading_hours.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden" id="q6">
-            <label class="form-label">How many times did you eat today?</label>
-            <input type="number" name="mealNum" class="form-control" min="0" max="10" step="1" id="meals">
+            {{ form.meals.label(class="form-label") }}
+            {{ form.meals(class="form-control", id="meals") }}
+            {% if form.meals.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.meals.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden relative" id="q7">
-            <label class="form-label">How many hours did you spend on mobile phone/computer?</label>
-            <input type="number" name="deviceHour" class="form-control" min="0" max="24" step="0.1" id="screen_hours">
-            <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 4-6 hrs</span>
+            {{ form.screen_hours.label(class="form-label") }}
+            {{ form.screen_hours(class="form-control", id="screen_hours") }}
+            <span class="tooltip absolute right-0 top-0 mt-2 mr-2 text-xs text-gray-500">Recommended: 4-6
+              hrs</span>
+            {% if form.screen_hours.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.screen_hours.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <!-- Feeling part -->
-          <h2 class="text-xl font-semibold mb-4">🔹 Feelings & Productivity</h2>
+          <h2 class="text-xl font-semibold mb-4">Feelings & Productivity</h2>
           <div class="mb-3 question hidden" id="q8">
-            <label class="form-label">How productive was your day? (1-10)</label>
-            <select class="form-select" name="productivityNum" id="productivity">
-              <option selected disabled>Select</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-              <option>6</option>
-              <option>7</option>
-              <option>8</option>
-              <option>9</option>
-              <option>10</option>
-            </select>
+            {{ form.productivity.label(class="form-label") }}
+            {{ form.productivity(class="form-select", id="productivity") }}
+            {% if form.productivity.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.productivity.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
 
           <div class="mb-3 question hidden" id="q9">
-            <label class="form-label">How is your mood today?</label>
-            <div class="emoji-select ">
-              <label class="text-base space-x-2"><input type="radio" name="mood" value="happy"><span
-                  class="text-2xl">&#128522;</span></label>
+            {{ form.mood.label(class="form-label") }}
+            <div class="emoji-select">
+              {% for subfield in form.mood %}
+              <label class="space-x-2">
+                {{ subfield }}
+                <span class="text-2xl">
+                  {% if subfield.data == 'happy' %}&#128522;
+                  {% elif subfield.data == 'neutral' %}&#128528;
+                  {% elif subfield.data == 'sad' %}&#128577;
+                  {% elif subfield.data == 'angry' %}&#128544;
+                  {% endif %}
+                </span>
+              </label>
               <br>
-              <label class="space-x-2"><input type="radio" name="mood" value="neutral"><span
-                  class="text-2xl">&#128528;</span></label>
-              <br>
-              <label class="space-x-2"><input type="radio" name="mood" value="sad"><span
-                  class="text-2xl">&#128577;</span></label>
-              <br>
-              <label class="space-x-2"><input type="radio" name="mood" value="angry"><span
-                  class="text-2xl">&#128544;</span></label>
+              {% endfor %}
             </div>
+            {% if form.mood.errors %}
+            <div class="text-red-500 text-sm mt-1">
+              {% for error in form.mood.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
             <button type="button" class="prev-btn btn btn-secondary mt-3">Previous</button>
             <button type="button" class="next-btn btn btn-primary mt-3 w-24">Next</button>
           </div>
-        </form>
-      </div>
-
-      <!-- Submission area -->
-      <div class="submit max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
-        <h2 class="text-2xl font-bold mb-4 text-center">Pre-Submission Disclaimer & Notes</h2>
-
-        <div class="text-gray-800 text-sm space-y-3 h-60 overflow-y-auto border p-4 rounded">
-          <p><strong>[Description of the use] </strong> The data you submit will be used to analyze and record your
-            health habits (e.g., hours of sleep) in order to provide personalized feedback and trend charts. </p>
-          <p><strong>[Data utilization] </strong> All data will only be used for local analysis and will not be uploaded
-            to servers or shared with third parties unless you voluntarily agree to do so. </p>
-          <p><strong>[Privacy protection] </strong> We store data in LocalStorage and do not collect any sensitive
-            identifying information about you. </p>
-          <p><strong>[User responsibility] </strong> Please ensure that the information you fill in is true and accurate
-            so that the system can provide effective feedback. </p>
-          <p><strong>[Disclaimer] </strong> This app is for daily habit self-management only and does not constitute any
-            medical advice. </p>
-          <hr>
-          <br>
-          <div class="mt-6 flex items-center space-x-2">
-            <input type="checkbox" id="agreeCheck" class="w-4 h-4">
-            <label for="agreeCheck" class="text-sm text-gray-700">I have read and agreed to the above statement </label>
-          </div>
-
-          <button id="submitBtn" class="mt-4 w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50" disabled>
-            Submit data
-          </button>
         </div>
-      </div>
+
+        <div class="submit max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 hidden">
+          <h2 class="text-2xl font-bold mb-4 text-center">Pre-Submission Disclaimer & Notes</h2>
+
+          <div class="text-gray-800 text-sm space-y-3 h-60 overflow-y-auto border p-4 rounded">
+            <p><strong>[Description of the use] </strong> The data you submit will be used to analyze and record your
+              health habits (e.g., hours of sleep) in order to provide personalized feedback and trend charts. </p>
+            <p><strong>[Data utilization] </strong> All data will only be used for local analysis and will not be
+              uploaded
+              to servers or shared with third parties unless you voluntarily agree to do so. </p>
+            <p><strong>[Privacy protection] </strong> We store data in LocalStorage and do not collect any sensitive
+              identifying information about you. </p>
+            <p><strong>[User responsibility] </strong> Please ensure that the information you fill in is true and
+              accurate
+              so that the system can provide effective feedback. </p>
+            <p><strong>[Disclaimer] </strong> This app is for daily habit self-management only and does not constitute
+              any
+              medical advice. </p>
+            <hr>
+            <br>
+            <div class="mt-6 flex items-center space-x-2">
+              <input type="checkbox" id="agreeCheck" class="w-4 h-4">
+              <label for="agreeCheck" class="text-sm text-gray-700">I have read and agreed to the above
+                statement</label>
+            </div>
+
+            <button type="submit" id="submitBtn"
+              class="mt-4 w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50" disabled>Submit</button>
+          </div>
+        </div>
+      </form>
     </div>
+
     <footer class="py-8 text-center text-sm text-gray-500">
       <div class="max-w-6xl mx-auto">
         <p>&copy; 2025 LifeTracker — Designed to help you grow.</p>
@@ -271,69 +323,6 @@
 
   <!-- Using external js files -->
   <script src="{{ url_for('static', filename='js/Click&Hide.js') }}"></script>
-  <script>
-    // Variables must be declared before they can be used
-    let isSubmitting = false;
-
-    document.getElementById('submitBtn').addEventListener('click', async function () {
-      if (isSubmitting) return;
-
-      isSubmitting = true;
-
-      // Disable button during submission
-      const submitBtn = this;
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
-
-      const data = {
-        exercise: document.querySelector('input[name="exercise"]:checked')?.value || 'no',
-        exercise_hours: document.getElementById('exercise_hours').value || 0,
-        water_intake: document.getElementById('water_intake').value || 0,
-        sleep_hours: document.getElementById('sleep_hours').value || 0,
-        reading_hours: document.getElementById('reading_hours').value || 0,
-        meals: document.getElementById('meals').value || 0,
-        screen_hours: document.getElementById('screen_hours').value || 0,
-        productivity: document.getElementById('productivity').value || 0,
-        mood: document.querySelector('input[name="mood"]:checked')?.value || ''
-      };
-
-      try {
-        const response = await fetch('/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value,
-          },
-          body: JSON.stringify(data)
-        });
-
-        // Check if response is JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          const text = await response.text();
-          throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
-        }
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.message || 'Submission failed');
-        }
-
-        alert(result.message);
-        window.location.href = "/daily_output";
-      } catch (error) {
-        console.error('Submission error:', error);
-        alert(error.message);
-      } finally {
-        isSubmitting = false;
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit data';
-      }
-    });
-  </script>
-
 </body>
 
 </html>

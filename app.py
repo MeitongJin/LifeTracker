@@ -19,7 +19,8 @@ from input import to_float, to_int
 from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
 from datetime import datetime, timedelta, date
 from sqlalchemy.exc import IntegrityError
-from flask_login import login_required
+# Import the form class
+from forms import DailyInputForm
 
 app = Flask(__name__)
 
@@ -306,74 +307,75 @@ def reset_password():
                          step=step)
 
 # User Input Route
-@app.route('/daily_input')
-@login_required
+@app.route('/daily_input', methods=['GET', 'POST'])
 def daily_input():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('Daily_input.html',user_name=session.get('user_name'))
+    
+    form = DailyInputForm()
+    
+    # Check if there's existing data for today
+    today = date.today()
+    existing_record = UserInput.query.filter_by(
+        user_id=session['user_id'],
+        date=today
+    ).first()
+    
+    if existing_record:
+        # Pre-populate form with existing data
+        form.exercise.data = existing_record.exercise
+        form.exercise_hours.data = existing_record.exercise_hours
+        form.water_intake.data = existing_record.water_intake
+        form.sleep_hours.data = existing_record.sleep_hours
+        form.reading_hours.data = existing_record.reading_hours
+        form.meals.data = existing_record.meals
+        form.screen_hours.data = existing_record.screen_hours
+        form.productivity.data = str(existing_record.productivity)
+        form.mood.data = existing_record.mood
+    
+    if form.validate_on_submit():
+        try:
+            if existing_record:
+                # Update existing record
+                existing_record.exercise = form.exercise.data
+                existing_record.exercise_hours = form.exercise_hours.data
+                existing_record.water_intake = form.water_intake.data
+                existing_record.sleep_hours = form.sleep_hours.data
+                existing_record.reading_hours = form.reading_hours.data
+                existing_record.meals = form.meals.data
+                existing_record.screen_hours = form.screen_hours.data
+                existing_record.productivity = int(form.productivity.data)
+                existing_record.mood = form.mood.data
+                message = 'Data updated successfully.'
+            else:
+                # Create new record
+                record = UserInput(
+                    user_id=session['user_id'],
+                    date=today,
+                    exercise=form.exercise.data,
+                    exercise_hours=form.exercise_hours.data,
+                    water_intake=form.water_intake.data,
+                    sleep_hours=form.sleep_hours.data,
+                    reading_hours=form.reading_hours.data,
+                    meals=form.meals.data,
+                    screen_hours=form.screen_hours.data,
+                    productivity=int(form.productivity.data),
+                    mood=form.mood.data
+                )
+                db.session.add(record)
+                message = 'Data submitted successfully.'
 
-# User Input Submission - Updated to overwrite existing entries
-@app.route('/submit', methods=['POST'])
-@csrf.exempt
-def submit():
-    try:
-        user_id = session.get('user_id')
-        if not user_id:
-            return jsonify({'status': 'error', 'message': 'User not logged in'}), 401
-
-        # Ensure request is JSON
-        if not request.is_json:
-            return jsonify({'status': 'error', 'message': 'Request must be JSON'}), 400
-
-        data = request.get_json()
-        if not data:
-            return jsonify({'status': 'error', 'message': 'No data received'}), 400
-
-        today = date.today()
-        
-        # Check for existing record
-        existing_record = UserInput.query.filter_by(
-            user_id=user_id,
-            date=today
-        ).first()
-
-        if existing_record:
-            # Update existing record
-            existing_record.exercise = data.get('exercise', existing_record.exercise)
-            existing_record.exercise_hours = to_float(data.get('exercise_hours', existing_record.exercise_hours))
-            existing_record.water_intake = to_float(data.get('water_intake', existing_record.water_intake))
-            existing_record.sleep_hours = to_float(data.get('sleep_hours', existing_record.sleep_hours))
-            existing_record.reading_hours = to_float(data.get('reading_hours', existing_record.reading_hours))
-            existing_record.meals = to_int(data.get('meals', existing_record.meals))
-            existing_record.screen_hours = to_float(data.get('screen_hours', existing_record.screen_hours))
-            existing_record.productivity = to_int(data.get('productivity', existing_record.productivity))
-            existing_record.mood = data.get('mood', existing_record.mood)
-            message = 'Data updated successfully.'
-        else:
-            # Create new record
-            record = UserInput(
-                user_id=user_id,
-                date=today,
-                exercise=data.get('exercise', 'no'),
-                exercise_hours=to_float(data.get('exercise_hours', 0)),
-                water_intake=to_float(data.get('water_intake', 0)),
-                sleep_hours=to_float(data.get('sleep_hours', 0)),
-                reading_hours=to_float(data.get('reading_hours', 0)),
-                meals=to_int(data.get('meals', 0)),
-                screen_hours=to_float(data.get('screen_hours', 0)),
-                productivity=to_int(data.get('productivity', 0)),
-                mood=data.get('mood', '')
-            )
-            db.session.add(record)
-            message = 'Data submitted successfully.'
-
-        db.session.commit()
-        return jsonify({'status': 'success', 'message': message})
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+            db.session.commit()
+            flash(message, 'success')
+            return redirect(url_for('daily_output'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error: {str(e)}', 'error')
+    
+    return render_template('Daily_input.html', 
+                         form=form,
+                         user_name=session.get('user_name'))
     
 # Output Route
 @app.route('/daily_output', methods=['GET'])
@@ -606,6 +608,56 @@ def clear_reset_session():
 @app.route('/')
 def index():
     return redirect(url_for('login'))
+
+# Submit data API
+@app.route('/submit', methods=['POST'])
+def submit():
+    if 'user_id' not in session:
+        return '', 401
+        
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data provided'}), 400
+        
+    try:
+        today = date.today()
+        existing_record = UserInput.query.filter_by(
+            user_id=session['user_id'],
+            date=today
+        ).first()
+        
+        if existing_record:
+            existing_record.exercise = data.get('exercise')
+            existing_record.exercise_hours = data.get('exercise_hours')
+            existing_record.water_intake = data.get('water_intake')
+            existing_record.sleep_hours = data.get('sleep_hours')
+            existing_record.reading_hours = data.get('reading_hours')
+            existing_record.meals = data.get('meals')
+            existing_record.screen_hours = data.get('screen_hours')
+            existing_record.productivity = data.get('productivity')
+            existing_record.mood = data.get('mood')
+        else:
+            record = UserInput(
+                user_id=session['user_id'],
+                date=today,
+                exercise=data.get('exercise'),
+                exercise_hours=data.get('exercise_hours'),
+                water_intake=data.get('water_intake'),
+                sleep_hours=data.get('sleep_hours'),
+                reading_hours=data.get('reading_hours'),
+                meals=data.get('meals'),
+                screen_hours=data.get('screen_hours'),
+                productivity=data.get('productivity'),
+                mood=data.get('mood')
+            )
+            db.session.add(record)
+            
+        db.session.commit()
+        return jsonify({'status': 'success'}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

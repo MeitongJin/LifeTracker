@@ -1,6 +1,6 @@
 import unittest
 from app import app, db
-from models import User
+from models import User, UserInput
 from flask_wtf.csrf import generate_csrf
 from flask import url_for, session
 from test_config import TestConfig
@@ -104,9 +104,13 @@ class TestLifeTrackerApp(unittest.TestCase):
                 'screen_hours': 4,
                 'productivity': 7,
                 'mood': '😊'
-            })
+                },
+                headers={'Content-Type': 'application/json'}
+            )
+            
             self.assertEqual(response.status_code, 200)
-            self.assertIn(b'success', response.data)
+            response_data = response.get_json()
+            self.assertEqual(response_data['status'], 'success')
 
     # 7. Test /daily_output page logic（Whether the log page prompts correctly when there is no data）
     def test_output_page_no_data(self):
