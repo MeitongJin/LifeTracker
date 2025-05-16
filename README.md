@@ -181,6 +181,46 @@ The application has been tested and works well with:
 - Microsoft Edge (version 90+)
 - Safari (version 14+)
 
+## Test
+
+This project includes both unit tests (logic-level validation) and end-to-end Selenium tests (browser-level automation).
+
+### Unit Testing: `test_app_unit.py`
+These tests validate core application logic, including:
+- User registration and login behavior
+- Password reset workflows
+- Protected route access
+- Form submission handling
+#### ▶️ To run unit tests:
+`python test_app_unit.py`
+These tests use an in-memory SQLite database and do not affect production data.
+
+### Selenium Testing: `test_app_selenium.py`
+These tests simulate real user actions in a headless browser, including:
+- Registering a new account
+- Logging in and logging out
+- Verifying page contents after login (e.g., dashboard/home)
+- Filling out forms (select cases)
+#### ▶️ Before running Selenium tests:
+Make sure the test server is running in a separate terminal:
+`python test_server.py`
+Then, in a new terminal:
+`python test_app_selenium.py`
+The test server uses an in-memory test database and automatically injects a test user.
+
+**NOTE**: Chrome and Chromedriver must be installed and available in your system PATH. See "Running Selenium" section below if needed.
+
+#### Running Selenium (Headless)
+To run Selenium tests without opening a browser window, tests use Chrome in headless mode.
+If you encounter issues like NoSuchDriverException or chromedriver not found, ensure you have:
+- Installed Google Chrome
+- Installed the correct version of [Chromedriver] (https://sites.google.com/chromium.org/driver/)
+- Placed chromedriver in your system path
+
+**NOTE**: If you can't find your Chrome version in the official Chromedriver list, it likely means you're using a pre-release or testing version of Chrome. For testing versions of Chrome, you can find the matching Chromedriver in the Chrome for [Testing section](https://googlechromelabs.github.io/chrome-for-testing/).
+
+
+
 ## Support
 
 For any issues or questions:
