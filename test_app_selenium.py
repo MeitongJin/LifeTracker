@@ -1,5 +1,6 @@
 import unittest
 import time
+import threading
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
@@ -7,10 +8,19 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
+from app import app
 
 class LifeTrackerSeleniumTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls.server_thread = threading.Thread(
+            target=app.run,
+            kwargs={"port": 5000, "use_reloader": False}
+        )
+        cls.server_thread.daemon = True
+        cls.server_thread.start()
+        time.sleep(1)
+
         options = Options()
         options.add_argument("--headless")  # Run in headless mode
         cls.driver = webdriver.Chrome(options=options)
