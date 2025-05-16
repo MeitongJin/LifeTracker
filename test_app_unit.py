@@ -3,6 +3,7 @@ from app import app, db
 from models import User
 from flask_wtf.csrf import generate_csrf
 from flask import url_for, session
+from test_config import TestConfig
 
 class TestLifeTrackerApp(unittest.TestCase):
     def setUp(self):
@@ -11,6 +12,7 @@ class TestLifeTrackerApp(unittest.TestCase):
         app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing
         app.config['SERVER_NAME'] = 'localhost'  # Required for url_for
         
+        app.config.from_object(TestConfig)
         self.client = app.test_client()
         with app.app_context():
             db.create_all()
