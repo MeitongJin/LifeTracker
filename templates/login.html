@@ -14,8 +14,9 @@
 
 <body>
     <div class="main-container">
-        <form class="auth-form" method="POST" action="/login">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <form class="auth-form" method="POST" action="{{ url_for('login') }}">
+            {{form.hidden_tag()}}
+            <!-- <input type="hidden" name="csrf_token" value="{{ csrf_token }}"> -->
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -30,10 +31,11 @@
             {% endwith %}
             <p class="auth-form-heading">Log In to <span class="highlighted-heading">Life Tracker</span></p>
             
-            <input type="email" placeholder="Enter your email" name="email" class="form-input"/>
-    
+            {{ form.email(class_="form-input", placeholder="Enter your email") }}    
+            
             <div class="relative w-full">
-                <input type="password" placeholder="Enter your password" name="password" class="form-input" id="login-password"/>
+                {{ form.password(class_="form-input", id="login-password", placeholder="Enter your password") }}
+                
                 <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('login-password', 'login-toggle-icon')">
                     <i class="fa-solid fa-eye" id="login-toggle-icon"></i>
                 </button>
@@ -41,7 +43,7 @@
 
             <a href="{{ url_for('reset_password') }}"  class="flex self-start text-sm -mt-1 mb-1 underline hover:text-gray-600 hover:cursor-pointer">Forgot your password?</a>
     
-            <button class="btn">Log In</button>
+            {{ form.submit(class_="btn") }}
 
             <p class="text-sm -mt-2">Don't have an account? <a href="{{ url_for('register') }}"  class="underline hover:text-gray-600 hover:cursor-pointer">Register</a></p>
         </form>
