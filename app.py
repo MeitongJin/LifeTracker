@@ -19,6 +19,7 @@ from input import to_float, to_int
 from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
 from datetime import datetime, timedelta, date
 from sqlalchemy.exc import IntegrityError
+from flask_login import login_required
 
 app = Flask(__name__)
 
@@ -306,6 +307,7 @@ def reset_password():
 
 # User Input Route
 @app.route('/daily_input')
+@login_required
 def daily_input():
     if 'user_id' not in session:
         return redirect(url_for('login'))

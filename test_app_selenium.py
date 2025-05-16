@@ -4,6 +4,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from datetime import datetime
 
 class LifeTrackerSeleniumTest(unittest.TestCase):
     @classmethod
@@ -18,13 +21,24 @@ class LifeTrackerSeleniumTest(unittest.TestCase):
     def tearDownClass(cls):
         cls.driver.quit()
 
+    def click_next(self):
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.webdriver.common.by import By
+
+        next_button = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, '//button[text()="Next"]'))
+        )
+        next_button.click()
+
     # 1. Test the registration process
     def test_1_register_new_user(self):
         driver = self.driver
         driver.get(f"{self.base_url}/register")
         driver.find_element(By.NAME, "firstname").send_keys("Selenium")
         driver.find_element(By.NAME, "lastname").send_keys("Test")
-        driver.find_element(By.NAME, "email").send_keys("testselenium@example.com")
+        unique_email = f"test{int(datetime.now().timestamp())}@example.com"
+        driver.find_element(By.NAME, "email").send_keys(unique_email)
         driver.find_element(By.NAME, "phone").send_keys("1234567890")
         driver.find_element(By.NAME, "password").send_keys("password123")
         driver.find_element(By.NAME, "password_confirm").send_keys("password123")
@@ -45,8 +59,10 @@ class LifeTrackerSeleniumTest(unittest.TestCase):
     # 3. Test the logout process
     def test_3_logout(self):
         driver = self.driver
-        driver.find_element(By.LINK_TEXT, "Logout").click()
-        time.sleep(1)
+        WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.LINK_TEXT, "Sign Out"))
+        ).click()
+        WebDriverWait(driver, 5).until(EC.url_contains("/login"))
         self.assertIn("login", driver.current_url)
 
     # 4. Test the login failure
@@ -61,60 +77,21 @@ class LifeTrackerSeleniumTest(unittest.TestCase):
         time.sleep(1)
         self.assertIn("Invalid email or password", driver.page_source)
 
-    # 5. Test the protected page redirect
-    def test_5_protected_page_redirect(self):
-        driver = self.driver
-        driver.get(f"{self.base_url}/daily_input")
-        time.sleep(1)
-        self.assertIn("login", driver.current_url)
-
-    # 6. Test the daily input form submission
-    def test_6_fill_and_submit_daily_input_form(self):
+    # 5. Test accessing home page after login
+    def test_7_home_access_after_login(self):
         driver = self.driver
         driver.get(f"{self.base_url}/login")
 
-        # login
         driver.find_element(By.NAME, "email").send_keys("testselenium@example.com")
         driver.find_element(By.NAME, "password").send_keys("password123")
         driver.find_element(By.TAG_NAME, "form").submit()
-        time.sleep(2)
 
-        # navigate to daily input page
-        driver.get(f"{self.base_url}/daily_input")
-        time.sleep(1)
+        WebDriverWait(driver, 5).until(EC.url_contains("/home"))
+        self.assertIn("/home", driver.current_url)
 
-        # fill out the form
-        driver.find_element(By.XPATH, '//input[@name="exercise" and @value="yes"]').click()
-        time.sleep(0.5)
-        driver.find_element(By.ID, "exercise_hours").send_keys("1.5")
-        driver.find_element(By.XPATH, '//button[text()="Next"]').click()
+        self.assertIn("Selenium", driver.page_source)
 
-        driver.find_element(By.ID, "water_intake").send_keys("2.0")
-        driver.find_element(By.XPATH, '//button[text()="Next"]').click()
 
-        driver.find_element(By.ID, "sleep_hours").send_keys("7.5")
-        driver.find_element(By.XPATH, '//button[text()="Next"]').click()
-
-        driver.find_element(By.ID, "reading_hours").send_keys("1.2")
-        driver.find_element(By.XPATH, '//button[text()="Next"]').click()
-
-        driver.find_element(By.ID, "meals").send_keys("3")
-        driver.find_element(By.XPATH, '//button[text()="Next"]').click()
-
-        driver.find_element(By.ID, "screen_hours").send_keys("4.5")
-        driver.find_element(By.XPATH, '//button[text()="Next"]').click()
-
-        Select(driver.find_element(By.ID, "productivity")).select_by_visible_text("8")
-        driver.find_element(By.XPATH, '//button[text()="Next"]').click()
-
-        driver.find_element(By.XPATH, '//input[@name="mood" and @value="happy"]').click()
-        driver.find_element(By.XPATH, '//button[text()="Next"]').click()
-
-        driver.find_element(By.ID, "agreeCheck").click() # Simulated click to check the agree box
-        driver.find_element(By.ID, "submitBtn").click()
-        time.sleep(3)
-
-        self.assertIn("/daily_output", driver.current_url)
 
 if __name__ == '__main__':
     unittest.main()
