@@ -4,21 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share View | LifeTracker</title>
-    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+
+    <link href="../static/css/output.css" rel="stylesheet">
+
+    <!-- <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet"> -->
 </head>
 <body>
-    <div class="main-container flex-col pb-5">
-        <div class="fixed top-0 bg-gray-50 w-full px-5 sm:px-7 md:px-10 py-5 flex flex-col justify-center items-center sm:flex-row sm:justify-between shadow">  
-            <h1 class="highlighted-heading sm:mr-5">LifeTracker</h1>
-            <div class="text-[1rem] xs:text-lg mt-3 sm:mt-0 mx-3 space-x-3 flex sm:items-center sm:justify-center xs:space-x-7">
+    <div class="flex flex-col min-h-screen pb-5">
+        <nav class="min-w-fit bg-white shadow py-5 px-7 flex flex-col space-y-3 justify-center items-center sm:py-4 sm:flex-row sm:space-y-0 sm:justify-between sm:space-x-3">
+            <a href="{{ url_for('home') }}" class="text-2xl font-semibold text-gray-900 hover:cursor-pointer">LifeTracker</a>
+            <div class="flex space-x-7">
                 <a href="{{ url_for('home') }}" class="navbar-item">Home</a>
-                <a href="{{ url_for('dashboard') }}" class="navbar-item">Dashboard</a>
-                <a href="{{ url_for('daily_output') }}" class="navbar-item">Track Progress</a>
-                <a href="{{ url_for('logout') }}" class="navbar-item">Sign Out</a>
+                <a href="{{ url_for('dashboard') }}" class="navbar-item text-gray-600">Dashboard</a>
+                <a href="{{ url_for('share_view') }}" class="navbar-item text-gray-600">Shared Data</a>
+                <a href="{{ url_for('daily_output') }}" class="navbar-item text-gray-600">Progress</a>
+                <a href="{{ url_for('logout') }}" class="navbar-item text-gray-600">Sign Out</a>
             </div>
-        </div>
+        </nav>
 
-        <div class="sharing-users self-start justify-items-start mx-10 mt-[100px]">
+        <div class="sharing-users self-start justify-items-start px-10 mt-8">
             <p class="text-xl sm:text-2xl">Users who have shared their data with you.</p>
         
             <div id="users-card" class="flex flex-wrap gap-4 mt-3">
@@ -41,7 +45,7 @@
 
         <!-- Chart viewer -->
         {% if viewing_user %}
-        <div class="mt-10">
+        <div class="mt-10 px-10">
             <div class="flex items-center space-x-2 justify-center">
                 <label for="rangeToggle">Viewing:</label>
                 <form method="GET" action="{{ url_for('share_view') }}" class="flex items-center space-x-2">
