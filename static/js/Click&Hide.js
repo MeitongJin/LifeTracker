@@ -61,8 +61,56 @@ document.getElementById('darkModeToggle').addEventListener('click', function () 
 const checkbox = document.getElementById('agreeCheck');
 const submitBtn = document.getElementById('submitBtn');
 
-checkbox.addEventListener('change', () => {
-  submitBtn.disabled = !checkbox.checked;
+// Make sure the element exists
+if (checkbox && submitBtn) {
+  // Initial state set to disabled
+  submitBtn.disabled = true;
+
+  checkbox.addEventListener('change', () => {
+    submitBtn.disabled = !checkbox.checked;
+  });
+}
+
+// Form Submission Processing
+document.querySelector('form').addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (!validateInputs()) {
+    return;
+  }
+
+  // Submit form
+  const formData = new FormData(this);
+  fetch(this.action, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+    }
+  })
+    .then(response => {
+      if (response.ok) {
+        // Empty Local Storage and Forms
+        localStorage.clear();
+        clearForm();
+        // Reset to first question
+        currentQuestion = 0;
+        showQuestion(currentQuestion);
+        // Hide submission area, show form area
+        document.querySelector('.submit').classList.add('hidden');
+        document.querySelector('.form-section').classList.remove('hidden');
+        // Uncheck the consent box and disable the submit button
+        document.getElementById('agreeCheck').checked = false;
+        document.getElementById('submitBtn').disabled = true;
+        // Show success message
+        alert('Data submitted successfully！');
+      } else {
+        alert('Submission failed, please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('There was an error submitting, please try again.');
+    });
 });
 
 function validateInputs() {
@@ -169,7 +217,7 @@ function loadFromLocal() {
 }
 
 
-// New function. Clear page after submitting data
+// New feature. Clear page after submitting data
 function clearForm() {
   const fields = [
     'exercise_hours',
@@ -181,17 +229,23 @@ function clearForm() {
     'productivity'
   ];
 
-  fields.forEach((id) => {
+  // Clear all text input fields
+  fields.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.value = "";
-    localStorage.removeItem(id);
+    if (el) el.value = '';
   });
 
-  document.querySelectorAll("input[type=radio]").forEach((r) => (r.checked = false));
-  localStorage.removeItem("exerciseRadio");
-  localStorage.removeItem("moodRadio");
+  // Clear exercise selection
+  const exerciseRadios = document.getElementsByName('exercise');
+  exerciseRadios.forEach(radio => {
+    radio.checked = false;
+  });
 
-  toggleExerciseInput(false);
+  // Clear Mood Selection
+  const moodRadios = document.getElementsByName('mood');
+  moodRadios.forEach(radio => {
+    radio.checked = false;
+  });
 }
 
 // Restore filled data when the page loads
@@ -202,42 +256,15 @@ document.querySelectorAll("input, select").forEach(el => {
   el.addEventListener("input", saveToLocal);
 });
 
-submitBtn.addEventListener('click', () => {
-  if (!validateInputs()) {
-    return;
-  }
-
-  // Collect data from the form
-  const data = {
-    exercise: document.querySelector('input[name="exercise"]:checked')?.value || "no",
-    exercise_hours: document.getElementById('exercise_hours')?.value || "0",
-    water_intake: document.getElementById('water_intake')?.value,
-    sleep_hours: document.getElementById('sleep_hours')?.value,
-    reading_hours: document.getElementById('reading_hours')?.value,
-    meals: document.getElementById('meals')?.value,
-    screen_hours: document.getElementById('screen_hours')?.value,
-    productivity: document.getElementById('productivity')?.value,
-    mood: document.querySelector('input[name="mood"]:checked')?.value || ""
-  };
-
-  // Send dara to server
-  fetch('/submit', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  }).then(response => response.json())
-    .then(result => {
-      if (result.status === 'success') {
-        alert("Congratulations! The data has been submitted!");
-        clearForm();
-        window.location.href = "/daily_output";  // Jump to daily_output after successful submission
+// Add event listeners for exercise radio buttons
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('input[name="exercise"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+      if (this.value === 'yes') {
+        toggleExerciseInput(true);
       } else {
-        alert("Submission failed: " + result.message);
+        toggleExerciseInput(false);
       }
-    }).catch(error => {
-      console.error('Error:', error);
-      alert("Submission error.");
     });
+  });
 });
