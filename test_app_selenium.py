@@ -1,6 +1,7 @@
 import unittest
 import time
 import threading
+from models import db, User
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
@@ -26,6 +27,20 @@ class LifeTrackerSeleniumTest(unittest.TestCase):
         cls.driver = webdriver.Chrome(options=options)
         cls.driver.implicitly_wait(5)
         cls.base_url = "http://127.0.0.1:5000"
+
+        from models import db, User
+        with app.app_context():
+            db.create_all()
+            if not User.query.filter_by(email="testselenium@example.com").first():
+                user = User(
+                    first_name="Selenium",
+                    last_name="Test",
+                    email="testselenium@example.com",
+                    phone="1234567890"
+                )
+                user.set_password("password123")
+                db.session.add(user)
+                db.session.commit()
 
     @classmethod
     def tearDownClass(cls):
