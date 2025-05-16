@@ -19,31 +19,57 @@
 
       <div class="flex flex-row space-x-3">
         <input type="text" placeholder="First Name" name="firstname" value="{{ firstname }}" class="form-input" required>
-        {% if errors.firstname %}<p class="text-red-600 text-sm mt-1"> <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.firstname }}</p>{% endif %}
+        {% if errors.firstname %}
+          <p class="text-red-600 text-sm mt-1"> 
+            <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.firstname }}
+          </p>
+        {% endif %}
+
         <input type="text" placeholder="Last Name" name="lastname" value="{{ lastname }}" class="form-input" required>
-        {% if errors.lastname %}<p class="text-red-600 text-sm mt-1"> <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.lastname }}</p>{% endif %}
+        {% if errors.lastname %}
+          <p class="text-red-600 text-sm mt-1"> 
+            <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.lastname }}
+          </p>
+        {% endif %}
       </div>
-        <input type="email" placeholder="Enter your email" name="email" value="{{ email }}" class="form-input" />
-        {% if errors.email %}<p class="text-red-600 text-sm mt-1"> <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.email }}</p>{% endif %}
-        <input type="number" pattern="[0-9]{10}" name="phone" placeholder="Enter your phone number" value="{{ phone }}" class="form-input" />
-        {% if errors.phone %}<p class="text-red-600 text-sm mt-1"> <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.phone }}</p>{% endif %}
 
+      <input type="email" placeholder="Enter your email" name="email" value="{{ email }}" class="form-input" />
+      {% if errors.email %}
+        <p class="text-red-600 text-sm mt-1"> 
+          <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.email }}
+        </p>
+      {% endif %}
 
-        <div class="relative w-full">
-          <input type="password" placeholder="Enter your password" name="password" class="form-input" id="register-password"/>
-          <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('register-password', 'register-toggle-icon')">
-              <i class="fa-solid fa-eye" id="register-toggle-icon"></i>
-          </button>
-        </div>
-        {% if errors.password %}<p class="text-red-600 text-sm mt-1"> <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.password }}</p>{% endif %}
+      <input type="number" pattern="[0-9]{10}" name="phone" placeholder="Enter your phone number" value="{{ phone }}" class="form-input" />
+      {% if errors.phone %}
+        <p class="text-red-600 text-sm mt-1"> 
+          <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.phone }}
+        </p>
+      {% endif %}
+
+      <div class="relative w-full">
+        <input type="password" placeholder="Enter your password" name="password" class="form-input" id="register-password"/>
+        <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('register-password', 'register-toggle-icon')">
+            <i class="fa-solid fa-eye" id="register-toggle-icon"></i>
+        </button>
+      </div>
+      {% if errors.password %}
+        <p class="text-red-600 text-sm mt-1"> 
+          <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.password }}
+        </p>
+      {% endif %}
         
-        <div class="relative w-full">
-          <input type="password" placeholder="Re-enter your password" name="password_confirm" class="form-input" id="register-repeat-password"/>
-          <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('register-repeat-password', 'register-repeat-toggle-icon')">
-              <i class="fa-solid fa-eye" id="register-repeat-toggle-icon"></i>
-          </button>
+      <div class="relative w-full">
+        <input type="password" placeholder="Re-enter your password" name="password_confirm" class="form-input" id="register-repeat-password"/>
+        <button class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" type = "button" onClick="togglePasswordButton('register-repeat-password', 'register-repeat-toggle-icon')">
+            <i class="fa-solid fa-eye" id="register-repeat-toggle-icon"></i>
+        </button>
       </div>
-      {% if errors.password_confirm %}<p class="text-red-600 text-sm mt-1"> <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.password_confirm }}</p>{% endif %}
+      {% if errors.password_confirm %}
+        <p class="text-red-600 text-sm mt-1"> 
+          <i class="bi bi-exclamation-circle-fill text-red-600 mr-1"></i> {{ errors.password_confirm }}
+        </p>
+      {% endif %}
 
       <button class="btn">Register</button>
 

@@ -19,8 +19,10 @@ from input import to_float, to_int
 from output import get_past_week_inputs, generate_bar_chart, generate_pie_chart
 from datetime import datetime, timedelta, date
 from sqlalchemy.exc import IntegrityError
-# Import the form class
+# Importing the wtf form
 from forms import DailyInputForm
+from login_form import LoginForm
+from reset_password import PasswordResetForm 
 
 app = Flask(__name__)
 
@@ -99,12 +101,14 @@ migrate = Migrate(app, db) # Update the database with Flask-Migrate
 # Login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '')
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        email = form.email.data.strip()
+        password = form.password.data
 
         user = User.query.filter_by(email=email).first()
-        
+
         if user and user.check_password(password):
             session['user_id'] = user.id
             session['user_name'] = user.first_name
@@ -112,10 +116,27 @@ def login():
             return redirect(url_for('home'))
         else:
             flash("Invalid email or password", "error")
-            return render_template('login.html')
 
-    csrf_token = generate_csrf()
-    return render_template('login.html', csrf_token=csrf_token)
+    return render_template('login.html', form=form) 
+    
+
+    # if request.method == 'POST':
+    #     email = request.form.get('email', '').strip()
+    #     password = request.form.get('password', '')
+
+    #     user = User.query.filter_by(email=email).first()
+        
+    #     if user and user.check_password(password):
+    #         session['user_id'] = user.id
+    #         session['user_name'] = user.first_name
+    #         flash("Login successful!", "success")
+    #         return redirect(url_for('home'))
+    #     else:
+    #         flash("Invalid email or password", "error")
+    #         return render_template('login.html')
+
+    # csrf_token = generate_csrf()
+    # return render_template('login.html', csrf_token=csrf_token)
 
 # Home Route (after login)
 @app.route('/home')
@@ -134,19 +155,18 @@ def logout():
 # Register Route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-
     if request.method == 'POST':
-        errors = {}  #<-- Dictionary to store field-specific errors
+        errors = {}
 
-        # Get form data with default empty strings
+        #extracting the data from form
         firstname = request.form.get('firstname', '').strip()
         lastname = request.form.get('lastname', '').strip()
         email = request.form.get('email', '').strip()
-        phone = request.form.get('phone', '').strip()  # Added default empty string
+        phone = request.form.get('phone', '').strip()
         password = request.form.get('password', '')
-        password_confirm = request.form.get('password_confirm', '')   
+        password_confirm = request.form.get('password_confirm', '')
 
-        # Validation
+        #validating the extracted data
         if not firstname:
             errors['firstname'] = 'First name is required.'
         if not lastname:
@@ -165,23 +185,17 @@ def register():
             errors['password'] = 'Password is required.'
         elif len(password) < 8:
             errors['password'] = 'Password must be at least 8 characters.'
-
         if password != password_confirm:
             errors['password_confirm'] = 'Passwords do not match.'
 
-        # If any errors, re-render the form with them
+        # if any errors, re-render the form
         if errors:
             return render_template('register.html', errors=errors,
                                    firstname=firstname, lastname=lastname,
                                    email=email, phone=phone)
 
-        # Create new user
-        new_user = User(
-            first_name=firstname,
-            last_name=lastname,
-            email=email,
-            phone=phone
-        )
+        # Register new user
+        new_user = User(first_name=firstname, last_name=lastname, email=email, phone=phone)
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
@@ -190,6 +204,62 @@ def register():
         return redirect(url_for('login'))
 
     return render_template('register.html', errors={}, firstname='', lastname='', email='', phone='')
+
+    # if request.method == 'POST':
+    #     errors = {}  #<-- Dictionary to store field-specific errors
+
+    #     # Get form data with default empty strings
+    #     firstname = request.form.get('firstname', '').strip()
+    #     lastname = request.form.get('lastname', '').strip()
+    #     email = request.form.get('email', '').strip()
+    #     phone = request.form.get('phone', '').strip()  # Added default empty string
+    #     password = request.form.get('password', '')
+    #     password_confirm = request.form.get('password_confirm', '')   
+
+    #     # Validation
+    #     if not firstname:
+    #         errors['firstname'] = 'First name is required.'
+    #     if not lastname:
+    #         errors['lastname'] = 'Last name is required.'
+    #     if not email:
+    #         errors['email'] = 'Email is required.'
+    #     elif not validate_email(email):
+    #         errors['email'] = 'Invalid email format.'
+    #     elif User.query.filter_by(email=email).first():
+    #         errors['email'] = 'Email already registered.'
+    #     if not phone:
+    #         errors['phone'] = 'Phone number is required.'
+    #     elif not validate_phone(phone):
+    #         errors['phone'] = 'Phone number must be 10 digits.'
+    #     if not password:
+    #         errors['password'] = 'Password is required.'
+    #     elif len(password) < 8:
+    #         errors['password'] = 'Password must be at least 8 characters.'
+
+    #     if password != password_confirm:
+    #         errors['password_confirm'] = 'Passwords do not match.'
+
+    #     # If any errors, re-render the form with them
+    #     if errors:
+    #         return render_template('register.html', errors=errors,
+    #                                firstname=firstname, lastname=lastname,
+    #                                email=email, phone=phone)
+
+    #     # Create new user
+    #     new_user = User(
+    #         first_name=firstname,
+    #         last_name=lastname,
+    #         email=email,
+    #         phone=phone
+    #     )
+    #     new_user.set_password(password)
+    #     db.session.add(new_user)
+    #     db.session.commit()
+
+    #     flash('Registration successful! Please log in.', 'success')
+    #     return redirect(url_for('login'))
+
+    # return render_template('register.html', errors={}, firstname='', lastname='', email='', phone='')
 
 # Reset Password
 @app.route('/resetPassword', methods=['GET', 'POST'])
@@ -221,16 +291,27 @@ def reset_password():
             flash("Failed to resend code. Please try again.", "error")
         return redirect(url_for('reset_password'))
     
+    form = PasswordResetForm()
+
     # Initialize step (default to 1)
     step = session.get('reset_step', 1)
 
+
     if request.method == 'POST':
+
         if step == 1:
-            email = request.form.get('email', '').strip()
+            #validate email only
+            if not form.email.data:
+                flash("Email is required.", "error")
+                return redirect(url_for('reset_password'))
+            if not form.email.validate(form):
+                flash("Invalid email address.", "error")
+                return redirect(url_for('reset_password'))
+
+            email = form.email.data.strip()
             user = User.query.filter_by(email=email).first()
-            
+
             if user:
-                # Generate and store code
                 reset_code = str(randint(100000, 999999))
                 session.update({
                     'reset_email': email,
@@ -238,27 +319,30 @@ def reset_password():
                     'reset_step': 2,
                     'code_timestamp': datetime.now().timestamp()
                 })
-                
+
                 try:
-                    msg = Message("Password Reset Code",
-                                recipients=[email])
+                    msg = Message("Password Reset Code", recipients=[email])
                     msg.body = f"Your reset code is: {reset_code}"
                     mail.send(msg)
                     flash("Reset code sent to your email", "success")
-                except Exception as e:
+                except Exception:
                     flash("Failed to send email. Please try again.", "error")
                     session.pop('reset_email', None)
                     session.pop('reset_code', None)
                     session.pop('reset_step', None)
                     return redirect(url_for('reset_password'))
-                
+
                 return redirect(url_for('reset_password'))
             else:
                 flash("Email not found", "error")
                 return redirect(url_for('reset_password'))
 
         elif step == 2:
-            user_code = request.form.get('code', '').strip()
+            if not form.code.data:
+                flash("Verification code is required.", "error")
+                return redirect(url_for('reset_password'))
+            
+            user_code = form.code.data.strip()
             stored_code = session.get('reset_code')
 
             if user_code == stored_code:
@@ -268,33 +352,45 @@ def reset_password():
                 flash("Incorrect code", "error")
 
         elif step == 3:
-            password = request.form.get('password')
-            confirm = request.form.get('password_confirm')
-            
-            if len(password) < 8:
+            #validate and confirm password
+            if not form.password.data or not form.password_confirm.data:
+                flash("Password and confirmation are required.", "error")
+                return redirect(url_for('reset_password'))
+            if not form.password.validate(form):
+                flash("Password must be at least 6 characters.", "error")
+                return redirect(url_for('reset_password'))
+            if not form.password_confirm.validate(form):
+                flash("Passwords must match.", "error")
+                return redirect(url_for('reset_password'))
+            if len(form.password.data) < 8:
                 flash("Password must be at least 8 characters", "error")
-            elif password != confirm:
+                return redirect(url_for('reset_password'))
+
+            password = form.password.data
+            confirm = form.password_confirm.data
+
+            if password != confirm:
                 flash("Passwords don't match", "error")
+                return redirect(url_for('reset_password'))
+
+            email = session.get('reset_email')
+            user = User.query.filter_by(email=email).first()
+            if user:
+                user.set_password(password)
+                db.session.commit()
+
+                session.pop('reset_email', None)
+                session.pop('reset_code', None)
+                session.pop('reset_step', None)
+                session.pop('code_timestamp', None)
+
+                flash("Password updated successfully!", "success")
+                return redirect(url_for('login'))
             else:
-                email = session.get('reset_email')
-                user = User.query.filter_by(email=email).first()
-                if user:
-                    user.set_password(password)
-                    db.session.commit()
-                    
-                    # Clean up session
-                    session.pop('reset_email', None)
-                    session.pop('reset_code', None)
-                    session.pop('reset_step', None)
-                    session.pop('code_timestamp', None)
-                    
-                    flash("Password updated successfully!", "success")
-                    return redirect(url_for('login'))
-                else:
-                    flash("Session expired", "error")
-                    return redirect(url_for('reset_password'))
-    
-    # Additional GET validation
+                flash("Session expired", "error")
+                return redirect(url_for('reset_password'))
+            
+    #additional GET validation
     if request.method == 'GET':
         if step == 2 and not all(k in session for k in ['reset_email', 'reset_code']):
             step = 1
@@ -302,9 +398,82 @@ def reset_password():
             session.pop('reset_code', None)
             session.pop('reset_step', None)
     
-    return render_template("resetPassword.html", 
-                         csrf_token=csrf_token, 
-                         step=step)
+    return render_template(
+        "resetPassword.html",                  
+        csrf_token=csrf_token, 
+        step=step,
+        form=form
+    )
+
+    # if request.method == 'POST':
+    #     if step == 1:
+    #         email = request.form.get('email', '').strip()
+    #         user = User.query.filter_by(email=email).first()
+            
+    #         if user:
+    #             # Generate and store code
+    #             reset_code = str(randint(100000, 999999))
+    #             session.update({
+    #                 'reset_email': email,
+    #                 'reset_code': reset_code,
+    #                 'reset_step': 2,
+    #                 'code_timestamp': datetime.now().timestamp()
+    #             })
+                
+    #             try:
+    #                 msg = Message("Password Reset Code",
+    #                             recipients=[email])
+    #                 msg.body = f"Your reset code is: {reset_code}"
+    #                 mail.send(msg)
+    #                 flash("Reset code sent to your email", "success")
+    #             except Exception as e:
+    #                 flash("Failed to send email. Please try again.", "error")
+    #                 session.pop('reset_email', None)
+    #                 session.pop('reset_code', None)
+    #                 session.pop('reset_step', None)
+    #                 return redirect(url_for('reset_password'))
+                
+    #             return redirect(url_for('reset_password'))
+    #         else:
+    #             flash("Email not found", "error")
+    #             return redirect(url_for('reset_password'))
+
+    #     elif step == 2:
+    #         user_code = request.form.get('code', '').strip()
+    #         stored_code = session.get('reset_code')
+
+    #         if user_code == stored_code:
+    #             session['reset_step'] = 3
+    #             return redirect(url_for('reset_password'))
+    #         else:
+    #             flash("Incorrect code", "error")
+
+    #     elif step == 3:
+    #         password = request.form.get('password')
+    #         confirm = request.form.get('password_confirm')
+            
+    #         if len(password) < 8:
+    #             flash("Password must be at least 8 characters", "error")
+    #         elif password != confirm:
+    #             flash("Passwords don't match", "error")
+    #         else:
+    #             email = session.get('reset_email')
+    #             user = User.query.filter_by(email=email).first()
+    #             if user:
+    #                 user.set_password(password)
+    #                 db.session.commit()
+                    
+    #                 # Clean up session
+    #                 session.pop('reset_email', None)
+    #                 session.pop('reset_code', None)
+    #                 session.pop('reset_step', None)
+    #                 session.pop('code_timestamp', None)
+                    
+    #                 flash("Password updated successfully!", "success")
+    #                 return redirect(url_for('login'))
+    #             else:
+    #                 flash("Session expired", "error")
+    #                 return redirect(url_for('reset_password'))
 
 # User Input Route
 @app.route('/daily_input', methods=['GET', 'POST'])
